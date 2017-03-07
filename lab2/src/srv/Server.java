@@ -20,13 +20,23 @@ public class Server {
 		if (args.length != 3)
 			throw (new Exception());
 		
-		new MulticastServerThread(args[0],args[1],args[2]).start();
+		// Create New Thread
+		MulticastServerThread mt = new MulticastServerThread(args[0],args[1],args[2]);
 		
+		
+		//Start Thread
+		mt.start();
+		
+		// Port for Unicast
 		int port = Integer.parseInt(args[0]);
 		
+		// Socket for Unicast Comunication
 		socket = new DatagramSocket(port);
 
+		// Buffer to read DatagramPacket
 		byte[] buf = new byte[256];
+		
+		//
 		DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
 		while (true) {
