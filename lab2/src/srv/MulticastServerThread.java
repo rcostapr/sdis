@@ -7,24 +7,31 @@ import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 
 public class MulticastServerThread extends Thread {
+	// Server Port for Unicast
 	public int port;
-	public int multicast_port;
-	public InetAddress group;
+	// Server Port for Multicast
+	public int multicastPort;
+	//  IP address for Multicast
+	public InetAddress multicastAddress;
+	//  IP address for Unicast
 	public InetAddress address;
-	public MulticastSocket multicast_socket;
+	// Server Socket for communication
+	public MulticastSocket multicastSocket;
+	// Datagram packets to implement a connectionless packet delivery service
 	public DatagramPacket serverInfo;
 
-	public MulticastServerThread(String port, String group,
-			String multicast_port) throws UnknownHostException {
+	public MulticastServerThread(String port, String multicastAddress,
+			String multicastPort) throws UnknownHostException {
+		
 		this.port = Integer.parseInt(port);
-		this.multicast_port = Integer.parseInt(multicast_port);
-		this.group = InetAddress.getByName(group);
+		this.multicastPort = Integer.parseInt(multicastPort);
+		this.multicastAddress = InetAddress.getByName(multicastAddress);
 		this.address = InetAddress.getLocalHost();
 
 		String msg = this.address.getHostAddress() + " " + this.port;
 
 		serverInfo = new DatagramPacket(msg.getBytes(), msg.length(),
-				this.group, this.multicast_port);
+				this.multicastAddress, this.multicastPort);
 	}
 
 	@Override
@@ -32,13 +39,16 @@ public class MulticastServerThread extends Thread {
 		// TODO Auto-generated method stub
 		super.run();
 		try {
-			multicast_socket = new MulticastSocket(multicast_port);
-			multicast_socket.setTimeToLive(1);
+			// Open socket for communication on multicastPort
+			multicastSocket = new MulticastSocket(multicastPort);
+			multicastSocket.setTimeToLive(1);
 
 			while (true) {
-				multicast_socket.send(serverInfo);
-				System.out.println("multicast: " + group.getHostAddress() + " "
-						+ multicast_port + ":" + address.getHostAddress() + " "
+				// Send Server INFO
+				multicastSocket.send(serverInfo);
+				
+				System.out.println("Multicast: " + multicastAddress.getHostAddress() + " "
+						+ multicastPort + ":" + address.getHostAddress() + " "
 						+ this.port);
 				Thread.sleep(1000);
 			}

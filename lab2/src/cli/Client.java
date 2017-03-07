@@ -11,7 +11,7 @@ public class Client {
 	public static MulticastSocket multicastSocket;
 
 	public static void main(String[] args) throws Exception {
-		// java Client <multicast_addr> <multicastPort> <oper> <opnd>*
+		// java Client <multicastAddress> <multicastPort> <oper> <opnd>*
 		// <plate number> <owner name>, for register
 		// <plate number>, for lookup
 		if (args.length < 4)
