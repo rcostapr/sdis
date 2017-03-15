@@ -2,6 +2,7 @@ package sharedbackup;
 
 import java.awt.EventQueue;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.border.LineBorder;
@@ -42,10 +43,17 @@ public class GUI {
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
-		JList list = new JList();
+		DefaultListModel model = new DefaultListModel();
+		JList list = new JList(model);
 		list.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		list.setBounds(10, 11, 245, 240);
+		
+		 // Initialize the list with items
+	    String[] items = { "A", "B", "C", "D" };
+	    for (int i = 0; i < items.length; i++) {
+	        model.add(i, items[i]);
+
+	      }
 		frame.getContentPane().add(list);
 	}
 }
