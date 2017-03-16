@@ -1,5 +1,7 @@
 package backend;
 
+import utils.Message;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -40,6 +42,7 @@ public class MCListener implements Runnable{
                     message = receiver.receiveMessage();
 
                     //TODO: split message
+                    Message receivedMessage = new Message(message);
 
                     //TODO: Launch MC HANDLER
                     //ConfigManager.getConfigManager()

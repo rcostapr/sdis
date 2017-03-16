@@ -10,7 +10,11 @@ import java.net.UnknownHostException;
 public class MulticastServer {
 
 	private static int TTL = 1;
+
+    public static final String ASCII_CODE = "US-ASCII";
 	private static int MAX_PACKET_SIZE  = 64000;
+
+	public static final String CRLF = "\r\n";
 
 	// Server Port for Multicast
 	public int multicastPort;
