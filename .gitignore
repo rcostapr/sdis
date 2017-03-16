@@ -3,3 +3,10 @@
 
 *.iml
 *.html
+sharedbackup/documentation/package-list
+
+\.project
+
+sharedbackup/documentation/script\.js
+
+sharedbackup/documentation/stylesheet\.css
