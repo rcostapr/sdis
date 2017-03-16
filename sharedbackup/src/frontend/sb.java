@@ -1,8 +1,6 @@
 package frontend;
 
-import java.io.File;
-
-import backend.configManager;
+import backend.ConfigManager;
 
 public class sb {
 
@@ -19,7 +17,7 @@ public class sb {
 		String mcrIP="";
 		String mcrPort="";
 		
-		configManager myConfig;
+		ConfigManager myConfig;
 		
 		if (myConfig.openCommunication(mcIP,mcPort,mdbIP,mdbPort,mcrIP,mcrPort))		
 		putChunk(fileTosave);
