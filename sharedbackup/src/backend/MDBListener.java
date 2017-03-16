@@ -1,5 +1,7 @@
 package backend;
 
+import utils.Message;
+
 import java.net.InetAddress;
 
 /**
@@ -36,10 +38,9 @@ public class MDBListener implements Runnable{
 
                 message = receiver.receiveMessage();
 
-                //TODO: split message
+                Message receivedMessage = new Message(message);
 
-                //TODO: Launch MDB HANDLER
-                //ConfigManager.getConfigManager()
+                ConfigManager.getConfigManager().getExecutorService().execute(new MDBHandler(receivedMessage));
             }
         }
         catch(Exception e){

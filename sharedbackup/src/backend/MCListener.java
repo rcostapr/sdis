@@ -43,10 +43,7 @@ public class MCListener implements Runnable{
 
                     Message receivedMessage = new Message(message);
 
-                    //TODO: Launch MC HANDLER
-                    ConfigManager.getConfigManager().getExecutor().execute(new MCHandler(receivedMessage));
-
-
+                    ConfigManager.getConfigManager().getExecutorService().execute(new MCHandler(receivedMessage));
                 }
             }
                 catch(Exception e){
