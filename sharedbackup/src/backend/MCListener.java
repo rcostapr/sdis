@@ -41,11 +41,10 @@ public class MCListener implements Runnable{
 
                     message = receiver.receiveMessage();
 
-                    //TODO: split message
                     Message receivedMessage = new Message(message);
 
                     //TODO: Launch MC HANDLER
-                    //ConfigManager.getConfigManager()
+                    ConfigManager.getConfigManager().getExecutor().execute(new MCHandler(receivedMessage));
 
 
                 }

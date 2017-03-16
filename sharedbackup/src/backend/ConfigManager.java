@@ -2,12 +2,15 @@ package backend;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 public class ConfigManager {
 	private static final String VERSION = "1.0";
 	private MCListener  mcListener;
 	private MDBListener  mdrListener;
 	private MDRListener mdbListener;
+	private ExecutorService mExecutor = null;
 
 
 
@@ -72,5 +75,6 @@ public class ConfigManager {
     public int getmMDRport() {
         return mMDRport;
     }
+    public Executor getExecutor (){return mExecutor;}
 	
 }
