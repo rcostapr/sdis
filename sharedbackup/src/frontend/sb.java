@@ -17,10 +17,11 @@ public class sb {
 		String mcrIP="";
 		String mcrPort="";
 		
-		ConfigManager myConfig;
+		ConfigManager myConfig = ConfigManager.getConfigManager();
 		
-		if (myConfig.openCommunication(mcIP,mcPort,mdbIP,mdbPort,mcrIP,mcrPort))		
-		putChunk(fileTosave);
+		if (myConfig.setAdresses(mcIP,mcPort,mdbIP,mdbPort,mcrIP,mcrPort)) {
+			putChunk(fileTosave);
+		}
 
 	}
 

@@ -9,7 +9,9 @@ public class ConfigManager {
 	private MDBListener  mdrListener;
 	private MDRListener mdbListener;
 
-	private InetAddress mcAddr = null , mdbAddr = null , mdrAddr = null ;
+
+
+    private InetAddress mcAddr = null , mdbAddr = null , mdrAddr = null ;
 	private int mMCport = 0, mMDBport = 0, mMDRport = 0;
 
 
@@ -47,5 +49,28 @@ public class ConfigManager {
 		}
 		return true;
 	}
+    public InetAddress getMcAddr() {
+        return mcAddr;
+    }
+
+    public InetAddress getMdbAddr() {
+        return mdbAddr;
+    }
+
+    public InetAddress getMdrAddr() {
+        return mdrAddr;
+    }
+
+    public int getmMCport() {
+        return mMCport;
+    }
+
+    public int getmMDBport() {
+        return mMDBport;
+    }
+
+    public int getmMDRport() {
+        return mMDRport;
+    }
 	
 }
