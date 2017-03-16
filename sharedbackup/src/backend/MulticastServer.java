@@ -23,10 +23,10 @@ public class MulticastServer {
 	// Datagram packets to implement a connectionless packet delivery service
 	public DatagramPacket serverInfo;
 
-	public MulticastServer(String multicastAddress, String multicastPort) throws UnknownHostException {
+	public MulticastServer(InetAddress multicastAddress, int multicastPort){
 
-		this.multicastPort = Integer.parseInt(multicastPort);
-		this.multicastAddress = InetAddress.getByName(multicastAddress);
+		this.multicastPort = multicastPort;
+		this.multicastAddress = multicastAddress;
 		this.multicastSocket = null;
 	}
 
