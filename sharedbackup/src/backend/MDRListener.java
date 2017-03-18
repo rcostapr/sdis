@@ -4,9 +4,6 @@ import utils.Message;
 
 import java.net.InetAddress;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class MDRListener implements Runnable{
     private static MDRListener mdrListener = null;
 
