@@ -26,7 +26,7 @@ public class MCListener implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("MC listener started");
+        System.out.println("MMC listener started");
         InetAddress addr = ConfigManager.getConfigManager().getMcAddr();
         int port = ConfigManager.getConfigManager().getmMCport();
 

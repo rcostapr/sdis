@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
 
 public class ConfigManager {
 	private static final String VERSION = "1.0";
-	private MCListener  mcListener;
-	private MDRListener  mdrListener;
-	private MDBListener mdbListener;
+	private MCListener mcListener;
+	private MDBListener mdrListener;
+	private MDRListener mdbListener;
 	private ExecutorService mExecutorService = null;
 
 	private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
@@ -50,29 +50,6 @@ public class ConfigManager {
 		}
 		return true;
 	}
-
-	public void init(){
-		initListeners();
-	}
-
-	private void initListeners() {
-		if(mcListener==null){
-			mcListener = MCListener.getInstance();
-			mExecutorService.execute(mcListener);
-		}
-		if(mdbListener==null){
-			mdbListener = MDBListener.getInstance();
-			mExecutorService.execute(mdbListener);
-		}
-		if(mdrListener==null){
-			mdrListener = MDRListener.getInstance();
-			mExecutorService.execute(mdrListener);
-		}
-	}
-
-	public InetAddress getMcAddr() {
-        return mcAddr;
-    }
 
 	public InetAddress getMcAddr() {
 		return mcAddr;

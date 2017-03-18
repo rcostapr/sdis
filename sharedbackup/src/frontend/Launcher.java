@@ -24,7 +24,6 @@ public class Launcher {
 		ConfigManager myConfig = ConfigManager.getConfigManager();
 
 		if (myConfig.setAdresses(mcIP,mcPort,mdbIP,mdbPort,mcrIP,mcrPort)){
-			myConfig.init();
 			try	{
 				Interface.getInstance().backupFile("C:\\test.txt",2);
 			}
