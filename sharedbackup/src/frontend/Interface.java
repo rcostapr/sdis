@@ -1,5 +1,8 @@
 package frontend;
 
+import backend.ConfigManager;
+import backend.SavedFile;
+
 /**
  * Created by Duarte on 16-Mar-17.
  */
@@ -17,12 +20,11 @@ public class Interface {
         return instance;
     }
 
-    public boolean backupFile(String filePath, int replication) {
+    public boolean backupFile(String filePath, int replication) throws SavedFile.FileDoesNotExistsException, SavedFile.FileTooLargeException {
         //TODO: add exceptions File too large, File already in system, File does not exist
-        SharedFile file = ConfigsManager.getInstance()
-                .getNewSharedFileInstance(filePath, replication);
+        SavedFile file = new SavedFile("C:\\test.txt",2);
 
-        FileBackup.getInstance().saveFile(file);
+        //FileBackup.getInstance().saveFile(file);
 
         return true;
     }
