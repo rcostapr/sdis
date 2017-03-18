@@ -4,9 +4,6 @@ import utils.Message;
 
 import java.util.Random;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class MDRHandler implements Runnable {
     private static final int TIMEOUT = 401;
     private Random random;
