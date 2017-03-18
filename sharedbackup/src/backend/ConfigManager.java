@@ -8,44 +8,40 @@ import java.util.concurrent.Executors;
 
 public class ConfigManager {
 	private static final String VERSION = "1.0";
-	private MCListener  mcListener;
-	private MDBListener  mdrListener;
+	private MCListener mcListener;
+	private MDBListener mdrListener;
 	private MDRListener mdbListener;
 	private ExecutorService mExecutorService = null;
 
-
-
-    private InetAddress mcAddr = null , mdbAddr = null , mdrAddr = null ;
+	private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
 	private int mMCport = 0, mMDBport = 0, mMDRport = 0;
-
 
 	// static
 	private static ConfigManager iConfigManager = null;
 
-	private ConfigManager(){
-		mcListener=null;
-		mdrListener=null;
-		mdbListener= null;
+	private ConfigManager() {
+		mcListener = null;
+		mdrListener = null;
+		mdbListener = null;
 		mExecutorService = Executors.newFixedThreadPool(60);
 
 	}
 
-	public static ConfigManager getConfigManager(){
-		if(iConfigManager==null){
+	public static ConfigManager getConfigManager() {
+		if (iConfigManager == null) {
 			iConfigManager = new ConfigManager();
 		}
-		return  iConfigManager;
+		return iConfigManager;
 	}
 
-
-	public boolean setAdresses(String mcIP,String mcPort,String mdbIP,String mdbPort,String mdrIP,String mdrPort) {
+	public boolean setAdresses(String mcIP, String mcPort, String mdbIP, String mdbPort, String mdrIP, String mdrPort) {
 
 		try {
 			this.mcAddr = InetAddress.getByName(mcIP);
 			this.mdbAddr = InetAddress.getByName(mdbIP);
 			this.mdrAddr = InetAddress.getByName(mdrIP);
 
-			this.mMCport= Integer.parseInt(mcPort);
+			this.mMCport = Integer.parseInt(mcPort);
 			this.mMDBport = Integer.parseInt(mdbPort);
 			this.mMDRport = Integer.parseInt(mdrPort);
 		} catch (UnknownHostException e) {
@@ -54,30 +50,33 @@ public class ConfigManager {
 		}
 		return true;
 	}
-    public InetAddress getMcAddr() {
-        return mcAddr;
-    }
 
-    public InetAddress getMdbAddr() {
-        return mdbAddr;
-    }
+	public InetAddress getMcAddr() {
+		return mcAddr;
+	}
 
-    public InetAddress getMdrAddr() {
-        return mdrAddr;
-    }
+	public InetAddress getMdbAddr() {
+		return mdbAddr;
+	}
 
-    public int getmMCport() {
-        return mMCport;
-    }
+	public InetAddress getMdrAddr() {
+		return mdrAddr;
+	}
 
-    public int getmMDBport() {
-        return mMDBport;
-    }
+	public int getmMCport() {
+		return mMCport;
+	}
 
-    public int getmMDRport() {
-        return mMDRport;
-    }
+	public int getmMDBport() {
+		return mMDBport;
+	}
 
-    public Executor getExecutorService (){return mExecutorService;}
-	
+	public int getmMDRport() {
+		return mMDRport;
+	}
+
+	public Executor getExecutorService() {
+		return mExecutorService;
+	}
+
 }

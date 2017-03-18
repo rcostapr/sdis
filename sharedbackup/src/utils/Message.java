@@ -10,63 +10,59 @@ import java.util.Arrays;
  */
 public class Message {
 
+	private String header;
+	private byte[] body;
 
-    private String header;
-    private byte[] body;
+	public Message(byte[] msg) {
+		byte[] headerEnd = null;
 
+		try {
+			headerEnd = new String(MulticastServer.CRLF + MulticastServer.CRLF).getBytes(MulticastServer.ASCII_CODE);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 
-    public Message(byte[] msg){
-        byte[] headerEnd = null;
+		int headerEndIndex = findIndexEndofLine(msg, headerEnd);
 
-        try{
-            headerEnd = new String(MulticastServer.CRLF+ MulticastServer.CRLF).getBytes(MulticastServer.ASCII_CODE);
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+		header = new String(Arrays.copyOfRange(msg, 0, headerEndIndex));
 
-        int headerEndIndex = findIndexEndofLine(msg,headerEnd);
+		try {
+			body = Arrays.copyOfRange(msg, headerEndIndex + MulticastServer.CRLF.length() * 2, msg.length);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// there is no body
+			body = null;
+		}
+	}
 
-        header= new String(Arrays.copyOfRange(msg,0,headerEndIndex));
+	public String getHeader() {
+		return header;
+	}
 
-        try {
-            body =Arrays.copyOfRange(msg, headerEndIndex + MulticastServer.CRLF.length()*2,
-                    msg.length);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // there is no body
-            body = null;
-        }
-    }
+	public void setHeader(String header) {
+		this.header = header;
+	}
 
-    public String getHeader() {
-        return header;
-    }
+	public byte[] getBody() {
+		return body;
+	}
 
-    public void setHeader(String header) {
-        this.header = header;
-    }
+	public void setBody(byte[] body) {
+		this.body = body;
+	}
 
-    public byte[] getBody() {
-        return body;
-    }
-
-    public void setBody(byte[] body) {
-        this.body = body;
-    }
-
-    private static int findIndexEndofLine (byte[] original, byte[] separator){
-        for (int i = 0; i < original.length; i++) {
-            for (int j = 0; j < separator.length; j++) {
-                if (separator[j] != original[i + j]) {
-                    break;
-                } else {
-                    if (j == separator.length - 1) {
-                        return i;
-                    }
-                }
-            }
-        }
-        // did not find index
-        return -1;
-    }
+	private static int findIndexEndofLine(byte[] original, byte[] separator) {
+		for (int i = 0; i < original.length; i++) {
+			for (int j = 0; j < separator.length; j++) {
+				if (separator[j] != original[i + j]) {
+					break;
+				} else {
+					if (j == separator.length - 1) {
+						return i;
+					}
+				}
+			}
+		}
+		// did not find index
+		return -1;
+	}
 }

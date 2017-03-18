@@ -8,89 +8,84 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by Duarte on 18-Mar-17.
  */
-public class SavedFile implements Serializable{
+public class SavedFile implements Serializable {
 
-    public static final long CHUNK_SIZE = 64000;
-    public static final long MAX_CHUNK = 1000000;
-    public static final long MAX_FILE = CHUNK_SIZE * (MAX_CHUNK - 1);
-    private String filePath;
-    private String fileId;
+	public static final long CHUNK_SIZE = 64000;
+	public static final long MAX_CHUNK = 1000000;
+	public static final long MAX_FILE = CHUNK_SIZE * (MAX_CHUNK - 1);
+	private String filePath;
+	private String fileId;
 
+	// private ArrayList<Chunk> chunkList;
+	private long chunkCounter;
+	private int mDesiredReplicationDegree;
 
-   // private ArrayList<Chunk> chunkList;
-    private long chunkCounter;
-    private int mDesiredReplicationDegree;
+	public SavedFile(String filePath, int desiredReplicationDegree) throws FileTooLargeException, FileDoesNotExistsException {
+		this.filePath = filePath;
 
+		validateFile();
 
-    public SavedFile(String filePath, int desiredReplicationDegree)
-            throws FileTooLargeException, FileDoesNotExistsException {
-        this.filePath = filePath;
+		mDesiredReplicationDegree = desiredReplicationDegree;
+		fileId = generateID(new File(filePath));
+		chunkCounter = 0;
+		// chunkList = new ArrayList<Chunk>();
 
-        validateFile();
+		// generate the chunks for this file
+		// generateChunks();
+	}
 
-        mDesiredReplicationDegree = desiredReplicationDegree;
-        fileId = generateID(new File(filePath));
-        chunkCounter = 0;
-       // chunkList = new ArrayList<Chunk>();
+	private String generateID(File file) {
+		// hash is generated from file name + file data + file size
 
-        // generate the chunks for this file
-        //generateChunks();
-    }
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 
-    private String generateID(File file) {
-        //hash is generated from file name + file data + file size
+		String file_id = file.getName();
+		file_id += file.lastModified();
 
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+		file_id += file.length();
 
-        String file_id = file.getName();
-        file_id += file.lastModified();
+		md.update(file_id.getBytes());
 
-        file_id += file.length();
+		byte[] result = md.digest();
 
-        md.update(file_id.getBytes());
+		StringBuilder result_string = new StringBuilder();
+		for (byte bb : result) {
+			result_string.append(String.format("%02X", bb));
+		}
+		return result_string.toString();
+	}
 
-        byte[] result = md.digest();
+	private void validateFile() throws FileTooLargeException, FileDoesNotExistsException {
 
-        StringBuilder result_string = new StringBuilder();
-        for (byte bb : result) {
-            result_string.append(String.format("%02X", bb));
-        }
-        return result_string.toString();
-    }
+		// exists
 
-    private void validateFile() throws FileTooLargeException, FileDoesNotExistsException {
+		if (!new File(filePath).exists()) {
+			throw new FileDoesNotExistsException();
+		}
 
-        //  exists
+		// not too big
 
-        if (!new File(filePath).exists()) {
-            throw new FileDoesNotExistsException();
-        }
+		if (getFileSize() > MAX_FILE) {
+			throw new FileTooLargeException();
+		}
+	}
 
-        // not too big
+	public long getFileSize() {
+		File file = new File(filePath);
+		return file.length();
+	}
 
-        if (getFileSize() > MAX_FILE) {
-            throw new FileTooLargeException();
-        }
-    }
+	public class FileDoesNotExistsException extends Exception {
 
-    public long getFileSize() {
-        File file = new File(filePath);
-        return file.length();
-    }
+	}
 
-    public class FileDoesNotExistsException extends Exception {
+	public class FileTooLargeException extends Exception {
 
-
-    }
-    public class FileTooLargeException extends Exception {
-
-
-    }
+	}
 }
-
