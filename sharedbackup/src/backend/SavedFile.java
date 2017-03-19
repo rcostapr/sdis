@@ -130,4 +130,11 @@ public class SavedFile implements Serializable {
 						+ " Replication Degree: " + chunkList.get(i).getCurrentReplicationDegree());
 		}
 	}
+	public ArrayList<Chunk> getChunkList() {
+		return chunkList;
+	}
+
+	public void setChunkList(ArrayList<Chunk> chunkList) {
+		this.chunkList = chunkList;
+	}
 }
