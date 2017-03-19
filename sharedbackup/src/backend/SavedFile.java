@@ -42,7 +42,7 @@ public class SavedFile implements Serializable {
 	}
 
 	private void generateChunks() {
-		long fileSize = getFileSize();
+		long fileSize = sfile.length();
 
 		for (int i = 0; i < fileSize; i += CHUNK_SIZE) {
 			chunkList.add(new Chunk(this, chunkCounter++));
@@ -108,8 +108,7 @@ public class SavedFile implements Serializable {
 	}
 
 	public long getFileSize() {
-		File file = new File(filePath);
-		return file.length();
+		return sfile.length();
 	}
 
 	public int getWantedReplicationDegree() {
