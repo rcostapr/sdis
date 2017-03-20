@@ -137,4 +137,8 @@ public class SavedFile implements Serializable {
 	public void setChunkList(ArrayList<Chunk> chunkList) {
 		this.chunkList = chunkList;
 	}
+
+	public boolean exists() {
+		return sfile.exists();
+	}
 }
