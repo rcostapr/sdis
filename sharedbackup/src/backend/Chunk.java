@@ -131,4 +131,12 @@ public class Chunk {
 			}
 		}
 	}
+	public void saveToFile(byte[] data) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void incCurrentReplication() {
+		// TODO Auto-generated method stub
+		
+	}
 }

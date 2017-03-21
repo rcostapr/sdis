@@ -2,6 +2,7 @@ package protocols;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.util.logging.Level;
 
 import sun.rmi.runtime.Log;
 import backend.Chunk;
@@ -31,8 +32,9 @@ public class ChunkBackup {
 
 		String header = "";
 
-		header += PUT_COMMAND + " " + alId + " " + chunk.getFileID() + " " + chunk.getChunkNo() + " " + chunk.getCurrentReplicationDegree()
-				+ MulticastServer.CRLF + chunk.getCurrentReplicationDegree() + MulticastServer.CRLF + MulticastServer.CRLF;
+		header += PUT_COMMAND + " " + chunk.getFileID() + " " + chunk.getChunkNo() + " "
+				+ chunk.getCurrentReplicationDegree() + MulticastServer.CRLF + chunk.getCurrentReplicationDegree()
+				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
 		byte[] data = chunk.getData();
 
@@ -52,32 +54,33 @@ public class ChunkBackup {
 
 		int counter = 0;
 
-		Log.log("Sending chunk " + chunk.getChunkNo() + " of file " + chunk.getFileID() + "with " + chunk.getData().length + " bytes");
+		System.out.println("Sending chunk " + chunk.getChunkNo() + " of file " + chunk.getFileID() + "with "
+				+ chunk.getData().length + " bytes");
 
 		do {
 			try {
 				sender.sendMessage(message);
-			} catch (HasToJoinException e1) {
+			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 			try {
-				Log.log("WAITING : " + PUT_TIME_INTERVAL * (int) Math.pow(2, counter));
+				System.out.println("WAITING : " + PUT_TIME_INTERVAL * (int) Math.pow(2, counter));
 				Thread.sleep(PUT_TIME_INTERVAL * (int) Math.pow(2, counter));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			counter++;
-			Log.log("REP DEG: " + chunk.getChunkNo() + " " + chunk.getCurrentReplicationDegree());
+			System.out.println("REP DEG: " + chunk.getChunkNo() + " " + chunk.getCurrentReplicationDegree());
 		} while (chunk.getCurrentReplicationDegree() > chunk.getCurrentReplicationDegree() && counter < MAX_RETRIES);
 
 		if (counter == MAX_RETRIES) {
 
-			Log.log("Did not reach necessary replication");
+			System.out.println("Did not reach necessary replication");
 
 			return false;
 		} else {
 
-			Log.log("Sent successfully");
+			System.out.println("Sent successfully");
 			return true;
 		}
 
@@ -100,20 +103,17 @@ public class ChunkBackup {
 
 		String message = null;
 
-		message = STORED_COMMAND + " " + chunk.getFileId() + " " + String.valueOf(chunk.getChunkNo()) + MulticastServer.CRLF
-				+ MulticastServer.CRLF;
+		message = STORED_COMMAND + " " + chunk.getFileID() + " " + String.valueOf(chunk.getChunkNo())
+				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
-		} catch (HasToJoinException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+
+			System.out.println("Sent STORED command for chunk of file " + chunk.getFileID() + " no "
+					+ chunk.getChunkNo() + " with " + data.length + " bytes");
 		}
-
-		Log.log("Sent STORED command for chunk of file " + chunk.getFileID() + " no " + chunk.getChunkNo() + " with " + data.length
-				+ " bytes");
-
 		return true;
 	}
 }

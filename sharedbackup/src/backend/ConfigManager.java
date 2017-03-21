@@ -79,4 +79,9 @@ public class ConfigManager {
 		return mExecutorService;
 	}
 
+	public void addSavedChunk(Chunk chunk) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
