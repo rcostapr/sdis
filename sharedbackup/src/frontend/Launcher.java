@@ -24,6 +24,8 @@ public class Launcher {
 		ConfigManager myConfig = ConfigManager.getConfigManager();
 		
 		if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mcrIP, mcrPort)) {
+
+
 			try {
 				Interface.getInstance().backupFile("c:\\sdis\\test.txt", 2);
 			} catch (SavedFile.FileTooLargeException ex) {

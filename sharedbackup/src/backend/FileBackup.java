@@ -1,5 +1,7 @@
 package backend;
 
+import protocols.ChunkBackup;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -26,7 +28,7 @@ public class FileBackup {
 
 			final Chunk chunk = list.get(i);
 
-			// ChunkBackup.getInstance().putChunk(chunk))
+			 ChunkBackup.getInstance().putChunk(chunk);
 		}
 
 		return true;

@@ -16,6 +16,8 @@ public class Chunk {
 	private String fileID;
 	private long chunkNo;
 	private int currentReplicationDegree;
+
+
 	private int wantedReplicationDegree;
 	private String chunkName;
 	private boolean isOwnMachineFile;
@@ -50,6 +52,10 @@ public class Chunk {
 		return currentReplicationDegree;
 	}
 
+	public int getWantedReplicationDegree() {
+		return wantedReplicationDegree;
+	}
+
 	public void setCurrentReplicationDegree(int currentReplicationDegree) {
 		this.currentReplicationDegree = currentReplicationDegree;
 	}
@@ -72,7 +78,7 @@ public class Chunk {
 
 	public String buildChunkName() {
 		
-		String chunkName = new File(file.getFilePath()).getName()  + String.format("%04d", chunkNo)+".chunk";
+		String chunkName = new File(file.getFilePath()).getName() +"_" + String.format("%04d", chunkNo)+".chunk";
 		return chunkName;
 	}
 	

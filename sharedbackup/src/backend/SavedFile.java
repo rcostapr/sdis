@@ -2,6 +2,7 @@ package backend;
 
 import java.io.File;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -81,10 +82,7 @@ public class SavedFile implements Serializable {
 		byte[] result = md.digest();
 
 
-		System.out.println(result.length);
-		System.out.println(bytesToHex(result).length());
-
-		return bytesToHex(result);
+		return bytesToHex(result).toString();
 	}
 
 	private static String bytesToHex(byte[] in) {

@@ -1,6 +1,7 @@
 package frontend;
 
 import backend.ConfigManager;
+import backend.FileBackup;
 import backend.SavedFile;
 
 /**
@@ -28,7 +29,7 @@ public class Interface {
 		
 		file.showFileChunks();
 
-		// FileBackup.getInstance().saveFile(file);
+		FileBackup.getInstance().saveFile(file);
 
 		return true;
 	}

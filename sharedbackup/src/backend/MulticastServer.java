@@ -63,6 +63,8 @@ public class MulticastServer {
 		try {
 			multicastSocket.setLoopbackMode(true);
 		} catch (SocketException e1) {
+
+			System.out.println("Failed loopback");
 			e1.printStackTrace();
 		}
 
