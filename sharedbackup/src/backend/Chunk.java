@@ -72,7 +72,7 @@ public class Chunk {
 
 	public String buildChunkName() {
 		
-		String chunkName = file.getFile().getName() + "." + String.format("%04d", chunkNo);
+		String chunkName = new File(file.getFilePath()).getName()  + String.format("%04d", chunkNo)+".chunk";
 		return chunkName;
 	}
 	
@@ -90,7 +90,7 @@ public class Chunk {
 				FileInputStream in = null;
 
 				try {
-					in = new FileInputStream(file.getFile().getPath());
+					in = new FileInputStream(file.getFilePath());
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}

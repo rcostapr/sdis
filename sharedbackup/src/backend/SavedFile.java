@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Duarte on 18-Mar-17.
@@ -19,11 +20,12 @@ public class SavedFile implements Serializable {
 	public static final long MAX_CHUNK = 1000000;
 	public static final long MAX_FILE = CHUNK_SIZE * (MAX_CHUNK - 1);
 
+
+
 	private String filePath;
 	private String fileId;
 	private ArrayList<Chunk> chunkList;
 	private long chunkCounter;
-	private File sfile;
 
 	private int wantedReplicationDegree;
 
@@ -33,8 +35,8 @@ public class SavedFile implements Serializable {
 		validateFile();
 
 		wantedReplicationDegree = desiredReplicationDegree;
-		sfile = new File(filePath);
-		fileId = generateID(sfile);
+
+		fileId = generateID(new File(filePath));
 		chunkCounter = 0;
 		chunkList = new ArrayList<Chunk>();
 
@@ -42,7 +44,7 @@ public class SavedFile implements Serializable {
 	}
 
 	private void generateChunks() {
-		long fileSize = sfile.length();
+		long fileSize = getFileSize();
 
 		for (int i = 0; i < fileSize; i += CHUNK_SIZE) {
 			chunkList.add(new Chunk(this, chunkCounter++));
@@ -75,14 +77,24 @@ public class SavedFile implements Serializable {
 
 		md.update(file_id.getBytes());
 
+
 		byte[] result = md.digest();
 
-		StringBuilder result_string = new StringBuilder();
-		for (byte bb : result) {
-			result_string.append(String.format("%02X", bb));
-		}
-		return result_string.toString();
+
+		System.out.println(result.length);
+		System.out.println(bytesToHex(result).length());
+
+		return bytesToHex(result);
 	}
+
+	private static String bytesToHex(byte[] in) {
+		final StringBuilder builder = new StringBuilder();
+		for(byte b : in) {
+			builder.append(String.format("%02x", b));
+		}
+		return builder.toString();
+	}
+
 
 	private void validateFile() throws FileTooLargeException, FileDoesNotExistsException {
 
@@ -103,12 +115,9 @@ public class SavedFile implements Serializable {
 		return fileId;
 	}
 
-	public File getFile() {
-		return sfile;
-	}
-
 	public long getFileSize() {
-		return sfile.length();
+		File f = new File(getFilePath());
+		return f.length();
 	}
 
 	public int getWantedReplicationDegree() {
@@ -121,6 +130,10 @@ public class SavedFile implements Serializable {
 
 	public class FileTooLargeException extends Exception {
 
+	}
+
+	public String getFilePath() {
+		return filePath;
 	}
 
 	public void showFileChunks() {
@@ -139,6 +152,6 @@ public class SavedFile implements Serializable {
 	}
 
 	public boolean exists() {
-		return sfile.exists();
+		return new File(filePath).exists();
 	}
 }
