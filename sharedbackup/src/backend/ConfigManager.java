@@ -1,5 +1,12 @@
 package backend;
 
+import sun.rmi.runtime.Log;
+import utils.Database;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executor;
@@ -9,9 +16,16 @@ import java.util.concurrent.Executors;
 public class ConfigManager {
 	private static final String VERSION = "1.0";
 	private MCListener mcListener;
+
+
+
+	private int myID;
 	private MDRListener mdrListener;
 	private MDBListener mdbListener;
 	private ExecutorService mExecutorService = null;
+
+	private boolean isDatabaseLoaded = false;
+	private Database database = null;
 
 	private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
 	private int mMCport = 0, mMDBport = 0, mMDRport = 0;
@@ -24,6 +38,7 @@ public class ConfigManager {
 		mdrListener = null;
 		mdbListener = null;
 		mExecutorService = Executors.newFixedThreadPool(60);
+		isDatabaseLoaded = loadDatabase();
 
 	}
 
@@ -32,6 +47,35 @@ public class ConfigManager {
 			iConfigManager = new ConfigManager();
 		}
 		return iConfigManager;
+	}
+
+	private boolean loadDatabase() {
+		try {
+			FileInputStream fileIn = new FileInputStream(Database.FILE);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+
+			try {
+				database = (Database) in.readObject();
+			} catch (ClassNotFoundException e) {
+
+
+				database = new Database();
+			}
+
+			in.close();
+			fileIn.close();
+
+		} catch (FileNotFoundException e) {
+			database = new Database();
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public void setDBDestination(String path)throws InvalidFolderException{
+		database.setFolder(path);
 	}
 
 	public boolean setAdresses(String mcIP, String mcPort, String mdbIP, String mdbPort, String mdrIP, String mdrPort) {
@@ -101,4 +145,40 @@ public class ConfigManager {
 		mExecutorService.shutdown();
 	}
 
+	public int getMyID() {
+		return myID;
+	}
+
+	public void setMyID(int myID) {
+		this.myID = myID;
+	}
+
+	public Chunk getSavedChunk(String fileId, int chunkNo) {
+		return database.getSavedChunk(fileId, chunkNo);
+	}
+
+	public void incChunkReplication(String fileId, int chunkNo)
+			throws InvalidChunkException {
+		database.incChunkReplication(fileId, chunkNo);
+		database.saveDatabase();
+	}
+	public static class ConfigurationsNotInitializedException extends Exception {
+	}
+
+	public static class InvalidFolderException extends Exception {
+
+	}
+
+	public static class InvalidBackupSizeException extends Exception {
+
+	}
+
+	public static class InvalidChunkException extends Exception {
+
+
+	}
+
+	public static class FileAlreadySaved extends Exception {
+
+	}
 }

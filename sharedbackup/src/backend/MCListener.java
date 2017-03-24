@@ -3,7 +3,7 @@ package backend;
 import utils.Message;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 /**
  * Created by Duarte on 16-Mar-17.
@@ -11,10 +11,15 @@ import java.net.UnknownHostException;
 public class MCListener implements Runnable{
 
 
+    public ArrayList<Chunk> pendingChunks;
+
     private static MCListener mcListener = null;
 
 
     private MCListener() {
+
+        pendingChunks = new ArrayList<Chunk>();
+
     }
 
     public static MCListener getInstance(){

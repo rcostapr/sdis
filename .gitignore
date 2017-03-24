@@ -12,3 +12,7 @@ sharedbackup/documentation/script\.js
 sharedbackup/documentation/stylesheet\.css
 
 sharedbackup/out/
+
+sharedbackup/src/META-INF/MANIFEST\.MF
+
+sharedbackup/metadata\.ser

@@ -22,7 +22,7 @@ public class MCHandler implements Runnable {
 
         String messageType = headerParts[0].trim();
         final String fileID;
-        final int ChunkNR;
+        final int chunkNR;
 
         //TODO:TAKE ME OUT LATER, JUST FOR TESTING
         System.out.println("Received Message: " + messageType);
@@ -30,7 +30,28 @@ public class MCHandler implements Runnable {
 
         switch (messageType) {
             case "STORED":
-                //stored
+
+                fileID = headerParts[3].trim();
+                chunkNR = Integer.parseInt(headerParts[4].trim());
+
+                try {
+                    //if the file is mine, ++ repCount of the chunk
+                    ConfigManager.getConfigManager().incChunkReplication(fileID,
+                            chunkNR);
+                } catch (ConfigManager.InvalidChunkException e) {
+
+                    // if not my file, ++ the count of the chunks im pending
+
+                    synchronized (MCListener.getInstance().pendingChunks) {
+                        for (Chunk chunk : MCListener
+                                .getInstance().pendingChunks) {
+                            if (fileID.equals(chunk.getFileID())
+                                    && chunk.getChunkNo() == chunkNR) {
+                                chunk.incCurrentReplication();
+                            }
+                        }
+                    }
+                }
                 break;
             case "GETCHUNK":
                 //getchunk

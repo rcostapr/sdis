@@ -2,11 +2,9 @@ package backend;
 
 import java.io.File;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Duarte on 18-Mar-17.
@@ -151,5 +149,17 @@ public class SavedFile implements Serializable {
 
 	public boolean exists() {
 		return new File(filePath).exists();
+	}
+
+
+	public void incChunkReplication(int chunkNo) throws ConfigManager.InvalidChunkException {
+		Chunk chunk = null;
+
+		try {
+			chunk = chunkList.get(chunkNo);
+		} catch (IndexOutOfBoundsException e) {
+			throw new ConfigManager.InvalidChunkException();
+		}
+		chunk.incCurrentReplication();
 	}
 }

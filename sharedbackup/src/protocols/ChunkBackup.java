@@ -1,19 +1,17 @@
 package protocols;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.util.logging.Level;
-
-import sun.rmi.runtime.Log;
 import backend.Chunk;
 import backend.ConfigManager;
 import backend.MulticastServer;
+
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 
 public class ChunkBackup {
 
 	public static final String PUT_COMMAND = "PUTCHUNK";
 	public static final String STORED_COMMAND = "STORED";
-	private static final int PUT_TIME_INTERVAL = 500;
+	private static final int PUT_TIME_INTERVAL = 1000;
 	private static final int MAX_RETRIES = 5;
 	private static ChunkBackup sInstance = null;
 
@@ -32,7 +30,7 @@ public class ChunkBackup {
 
 		String header = "";
 
-		header += PUT_COMMAND + " " + "1.0 " + chunk.getFileID() + " " + chunk.getChunkNo() + " "
+		header += PUT_COMMAND + " " + "1.0"+" "+ ConfigManager.getConfigManager().getMyID()+" " + chunk.getFileID() + " " + chunk.getChunkNo() + " "
 				+ chunk.getWantedReplicationDegree()
 				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
@@ -57,9 +55,6 @@ public class ChunkBackup {
 
 		int counter = 0;
 
-		System.out.println("Sending chunk " + chunk.getChunkNo() + " of file " + chunk.getFileID() + "with "
-				+ chunk.getData().length + " bytes");
-
 		do {
 			try {
 				sender.sendMessage(message);
@@ -74,11 +69,11 @@ public class ChunkBackup {
 			}
 			counter++;
 			System.out.println("REP DEG: " + chunk.getChunkNo() + " " + chunk.getCurrentReplicationDegree());
-		} while (chunk.getCurrentReplicationDegree() > chunk.getCurrentReplicationDegree() && counter < MAX_RETRIES);
+		} while (chunk.getWantedReplicationDegree() > chunk.getCurrentReplicationDegree() && counter < MAX_RETRIES);
 
 		if (counter == MAX_RETRIES) {
 
-			System.out.println("Did not reach necessary replication");
+			System.out.println("Did not reach wanted replication");
 
 			return false;
 		} else {

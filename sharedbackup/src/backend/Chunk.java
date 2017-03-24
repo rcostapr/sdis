@@ -20,7 +20,7 @@ public class Chunk {
 
 	private int wantedReplicationDegree;
 	private String chunkName;
-	private boolean isOwnMachineFile;
+	private boolean isMyFile;
 
 	public Chunk(SavedFile tFile, long tChunkno) {
 		file = tFile;
@@ -29,7 +29,7 @@ public class Chunk {
 		currentReplicationDegree = 0;
 		wantedReplicationDegree = tFile.getWantedReplicationDegree();
 		chunkName = buildChunkName();
-		isOwnMachineFile = true;
+		isMyFile = true;
 
 	}
 	public Chunk(String fileId, int chunkNo, int desiredReplication) {
@@ -37,7 +37,7 @@ public class Chunk {
 		this.chunkNo = chunkNo;
 		this.fileID = fileId;
 		this.wantedReplicationDegree = desiredReplication;
-		isOwnMachineFile = false;
+		isMyFile = false;
 	}
 
 	public long getChunkNo() {
@@ -84,7 +84,7 @@ public class Chunk {
 	
 	public byte[] getData() {
 
-		if (isOwnMachineFile) {
+		if (isMyFile) {
 			if (file.exists()) {
 
 				int offset = (int) (SavedFile.CHUNK_SIZE * chunkNo);
@@ -144,5 +144,9 @@ public class Chunk {
 	public void incCurrentReplication() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public int getCurrentReplicationDeg() {
+		return currentReplicationDegree;
 	}
 }

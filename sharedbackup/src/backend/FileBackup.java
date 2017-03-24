@@ -2,9 +2,6 @@ package backend;
 
 import protocols.ChunkBackup;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class FileBackup {
@@ -30,7 +27,6 @@ public class FileBackup {
 
 			 ChunkBackup.getInstance().putChunk(chunk);
 		}
-
 		return true;
 	}
 }
