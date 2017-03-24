@@ -40,12 +40,15 @@ public class ChunkBackup {
 
 		byte[] message = new byte[header.length() + data.length];
 
+
 		try {
 			System.arraycopy(header.getBytes(MulticastServer.ASCII_CODE), 0, message, 0, header.length());
 		} catch (UnsupportedEncodingException e1) {
+
 			e1.printStackTrace();
 		}
 		System.arraycopy(data, 0, message, header.length(), data.length);
+
 
 		InetAddress multDBAddr = ConfigManager.getConfigManager().getMdbAddr();
 		int multDBPort = ConfigManager.getConfigManager().getmMDBport();

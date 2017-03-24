@@ -21,6 +21,10 @@ public class Interface {
 		return instance;
 	}
 
+	public void startUp(){
+		ConfigManager.getConfigManager().startupListeners();
+	}
+
 	public boolean backupFile(String filePath, int replication) throws SavedFile.FileDoesNotExistsException,
 			SavedFile.FileTooLargeException {
 		// TODO: add exceptions File too large, File already in system, File  does not exist

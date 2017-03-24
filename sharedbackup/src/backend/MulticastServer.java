@@ -55,8 +55,14 @@ public class MulticastServer {
 		
 	}
 	
-	public boolean sendMessage(byte[] messg) throws Exception {
-		
+	public boolean sendMessage(byte[] messg) {
+
+		try {
+			multicastSocket = new MulticastSocket();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
 		DatagramPacket packet = new DatagramPacket(messg, messg.length,
 				multicastAddress, multicastPort);
 		

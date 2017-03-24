@@ -51,7 +51,7 @@ public class ConfigManager {
 		return true;
 	}
 
-	private void startupListeners() {
+	public void startupListeners() {
 		if (mcListener == null) {
 			mcListener = MCListener.getInstance();
 			mExecutorService.execute(mcListener);
@@ -96,7 +96,9 @@ public class ConfigManager {
 
 	public void addSavedChunk(Chunk chunk) {
 		// TODO Auto-generated method stub
-		
+	}
+	public void terminate (){
+		mExecutorService.shutdown();
 	}
 
 }

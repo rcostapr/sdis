@@ -25,7 +25,7 @@ public class Launcher {
 		
 		if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mcrIP, mcrPort)) {
 
-
+			Interface.getInstance().startUp();
 			try {
 				Interface.getInstance().backupFile("c:\\sdis\\test.txt", 2);
 			} catch (SavedFile.FileTooLargeException ex) {
@@ -34,6 +34,8 @@ public class Launcher {
 				System.out.println("File does not exist!");
 			}
 		}
+
+		myConfig.terminate();
 
 	}
 }
