@@ -2,9 +2,15 @@ package frontend;
 
 import backend.ConfigManager;
 import backend.SavedFile;
+import utils.RMI_Interface;
+import utils.RMI_Server;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.net.*;
+import java.rmi.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 public class Launcher {
 
@@ -17,6 +23,12 @@ public class Launcher {
 		// int replication = Integer.parseInt(args[2]);
 		File program;
 		String programName="";
+
+		try {
+			System.out.println(java.net.InetAddress.getLocalHost());
+		} catch (java.net.UnknownHostException e) {
+			e.printStackTrace();
+		}
 
 		String mcIP = null;
 		String mcPort= null;
@@ -55,7 +67,7 @@ public class Launcher {
 				String[] arr = args[4].split(":");
 				mdbIP = arr[0];
 				try {
-					mdbPort= arr[1];
+					mdbPort = arr[1];
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
@@ -63,18 +75,21 @@ public class Launcher {
 
 			if (args[5].indexOf(':') > -1) { // <-- does it contain ":"?
 				String[] arr = args[5].split(":");
-				mcrIP= arr[0];
+				mcrIP = arr[0];
 				try {
-					mcrPort= arr[1];
+					mcrPort = arr[1];
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
 			}
 
 
-
 			ConfigManager myConfig = ConfigManager.getConfigManager();
 			myConfig.setMyID(Integer.parseInt(args[1]));
+			myConfig.setRMI_Object_Name(args[2]);
+
+
+
 
 
 			try {
@@ -88,12 +103,13 @@ public class Launcher {
 
 				Interface.getInstance().startUp();
 				try {
-					Interface.getInstance().backupFile("c:\\sdis\\test.txt", 2);
+					Interface.getInstance().backupFile("\\test.txt", 2);
 				} catch (SavedFile.FileTooLargeException ex) {
 
 				} catch (SavedFile.FileDoesNotExistsException ex1) {
 					System.out.println("File does not exist!");
 				}
+
 			}
 
 			myConfig.terminate();

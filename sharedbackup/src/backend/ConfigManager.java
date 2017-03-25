@@ -24,6 +24,10 @@ public class ConfigManager {
 	private MDBListener mdbListener;
 	private ExecutorService mExecutorService = null;
 
+
+
+	private String RMI_Object_Name = null;
+
 	private boolean isDatabaseLoaded = false;
 	private Database database = null;
 
@@ -76,6 +80,10 @@ public class ConfigManager {
 
 	public void setDBDestination(String path)throws InvalidFolderException{
 		database.setFolder(path);
+	}
+
+	public void setRMI_Object_Name(String nome){
+		RMI_Object_Name = nome;
 	}
 
 	public boolean setAdresses(String mcIP, String mcPort, String mdbIP, String mdbPort, String mdrIP, String mdrPort) {
@@ -162,6 +170,11 @@ public class ConfigManager {
 		database.incChunkReplication(fileId, chunkNo);
 		database.saveDatabase();
 	}
+
+	public String getRMI_Object_Name() {
+		return RMI_Object_Name;
+	}
+
 	public static class ConfigurationsNotInitializedException extends Exception {
 	}
 
