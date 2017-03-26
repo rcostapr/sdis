@@ -138,8 +138,8 @@ public class Chunk implements Serializable{
 		// TODO Auto-generated method stub
 		
 	}
-	public void incCurrentReplication() {
-		// TODO Auto-generated method stub
+	public synchronized int incCurrentReplication() {
+		return ++currentReplicationDegree;
 		
 	}
 
