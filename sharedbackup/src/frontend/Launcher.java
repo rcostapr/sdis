@@ -1,10 +1,9 @@
 package frontend;
 
 import backend.ConfigManager;
-import backend.SavedFile;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.net.*;
 
 public class Launcher {
 
@@ -17,6 +16,12 @@ public class Launcher {
 		// int replication = Integer.parseInt(args[2]);
 		File program;
 		String programName="";
+
+		try {
+			System.out.println(java.net.InetAddress.getLocalHost());
+		} catch (java.net.UnknownHostException e) {
+			e.printStackTrace();
+		}
 
 		String mcIP = null;
 		int mcPort=81;
@@ -62,7 +67,6 @@ public class Launcher {
 					e.printStackTrace();
 				}
 			}
-
 			if (args[5].indexOf(':') > -1) { // <-- does it contain ":"?
 				String[] arr = args[5].split(":");
 				mdrIP= arr[0];
@@ -79,28 +83,16 @@ public class Launcher {
 			myConfig.setMyID(Integer.parseInt(args[1]));
 			System.out.println("myConfig.database.getMaxBackupSize() = " + myConfig.database.getMaxBackupSize());
 
-
+			System.out.println("args[2] = " + args[2]);
+			System.out.println("args[1] = " + args[1]);
+			Interface.getInstance().setAccessPoint(args[2]);
 
 			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort)) {
-				Interface.getInstance().init();
-				try {
-					myConfig.database.setAvailSpace(80*1000);
-					myConfig.saveDB();
 
-				} catch (ConfigManager.InvalidBackupSizeException e) {
-					e.printStackTrace();
-				}
-				try {
-					Interface.getInstance().backupFile("test.txt", 1);
-				} catch (SavedFile.FileTooLargeException ex) {
+				Interface.getInstance().startUp();
+				//Interface.getInstance().backupFile("\\test.txt", 2);
 
-				} catch (SavedFile.FileDoesNotExistsException ex1) {
-					System.out.println("File does not exist!");
-				}
 			}
-
-
-
 		}
 	}
 }

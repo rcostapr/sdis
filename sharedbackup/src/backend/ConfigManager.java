@@ -24,6 +24,10 @@ public class ConfigManager {
 	private MDBListener mdbListener;
 	private ExecutorService mExecutorService = null;
 
+
+
+	private String RMI_Object_Name = null;
+
 	private boolean isDatabaseLoaded = false;
 	public Database database = null;
 
@@ -76,6 +80,9 @@ public class ConfigManager {
 	}
 
 
+	public void setRMI_Object_Name(String nome){
+		RMI_Object_Name = nome;
+	}
 
 	public boolean setAdresses(String mcIP, int mcPort, String mdbIP, int mdbPort, String mdrIP, int mdrPort) {
 
@@ -170,6 +177,11 @@ public class ConfigManager {
 	public SavedFile getNewSavedFile(String path, int replication)
 			throws SavedFile.FileTooLargeException, FileAlreadySaved, SavedFile.FileDoesNotExistsException {
 		return database.getNewSavedFile(path, replication);
+	}
+
+
+	public String getRMI_Object_Name() {
+		return RMI_Object_Name;
 	}
 
 	public static class ConfigurationsNotInitializedException extends Exception {
