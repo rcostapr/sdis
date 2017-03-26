@@ -67,7 +67,7 @@ public class MulticastServer {
 				multicastAddress, multicastPort);
 		
 		try {
-			multicastSocket.setLoopbackMode(true);
+			multicastSocket.setLoopbackMode(false);
 		} catch (SocketException e1) {
 
 			System.out.println("Failed loopback");

@@ -138,7 +138,8 @@ public class ConfigManager {
 	}
 
 	public void addSavedChunk(Chunk chunk) {
-		// TODO Auto-generated method stub
+		database.addChunk(chunk);
+		saveDB();
 	}
 	public void terminate (){
 		mExecutorService.shutdown();

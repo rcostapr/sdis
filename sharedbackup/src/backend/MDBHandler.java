@@ -51,7 +51,6 @@ public class MDBHandler implements Runnable {
                 if (chunkOBJ == null){
                     Chunk actualChunk = new Chunk(fileID,chunkNo,wantedReplication);
 
-
                     synchronized (MCListener.getInstance().pendingChunks) {
                         MCListener.getInstance().pendingChunks
                                 .add(actualChunk);

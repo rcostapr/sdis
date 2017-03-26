@@ -41,8 +41,6 @@ public class MCHandler implements Runnable {
                 try {
                     ConfigManager.getConfigManager().incChunkReplication(fileID,
                             chunkNR);
-
-                    System.out.println("++REP Count");
                 } catch (ConfigManager.InvalidChunkException e) {
                     e.printStackTrace();
                 }

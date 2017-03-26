@@ -93,12 +93,12 @@ public class ChunkBackup {
 		MulticastServer sender = new MulticastServer(multCtrlAddr, multCtrlPort);
 
 		// save chunk in file
-		//chunk.saveToFile(data);
+		chunk.saveToFile(data);
 
-		//chunk.incCurrentReplication();
+		chunk.incCurrentReplication();
 
 		// add chunk to database
-		//ConfigManager.getConfigManager().addSavedChunk(chunk);
+		ConfigManager.getConfigManager().addSavedChunk(chunk);
 
 		String message = null;
 

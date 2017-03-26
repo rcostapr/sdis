@@ -25,7 +25,7 @@ public class Chunk implements Serializable{
 		fileID = tFile.getFileId();
 		currentReplicationDegree = 0;
 		wantedReplicationDegree = tFile.getWantedReplicationDegree();
-		chunkName = buildChunkName();
+
 		isMyFile = true;
 
 	}
@@ -69,16 +69,14 @@ public class Chunk implements Serializable{
 		this.fileID = fileID;
 	}
 
-	public void setChunkName(String chunkName) {
-		this.chunkName = chunkName;
+	public String getPath(){
+		if (!isMyFile) {
+			return chunkName;
+		} else {
+			return file.getFilePath();
+		}
 	}
 
-	public String buildChunkName() {
-		
-		String chunkName = new File(file.getFilePath()).getName() +"_" + String.format("%04d", chunkNo)+".chunk";
-		return chunkName;
-	}
-	
 	public byte[] getData() {
 
 		if (isMyFile) {
@@ -99,7 +97,7 @@ public class Chunk implements Serializable{
 				}
 				try {
 					in.skip(offset);
-					
+
 					in.read(chunk, 0, chunkSize);
 
 					//Log.log("Lenght chunk" + chunkSize);
@@ -134,13 +132,43 @@ public class Chunk implements Serializable{
 			}
 		}
 	}
-	public void saveToFile(byte[] data) {
-		// TODO Auto-generated method stub
-		
+	public boolean saveToFile(byte[] data) {
+		FileOutputStream out = null;
+		try {
+			File f = new File(fileID+"/"+chunkNo);
+			if(f.getParentFile().mkdir())
+				System.out.println("FILE DIR DIDNT EXIST");
+			out = new FileOutputStream(f);
+		} catch (FileNotFoundException e) {
+			System.out.println("merda1");
+			e.printStackTrace();
+			return false;
+		}
+		try {
+			out.write(data);
+		} catch (IOException e) {
+
+			System.out.println("merda");
+			e.printStackTrace();
+			try {
+				out.close();
+			} catch (IOException e1) {
+
+				System.out.println("merda2");
+				e1.printStackTrace();
+			}
+			return false;
+		}
+		try {
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 	public synchronized int incCurrentReplication() {
 		return ++currentReplicationDegree;
-		
+
 	}
 
 	public int getCurrentReplicationDeg() {

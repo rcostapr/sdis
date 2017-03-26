@@ -75,17 +75,16 @@ public class Database implements Serializable {
             }
         }
 
-        /*
         if (rChunk == null) {
-            for (SharedFile file : mSharedFiles.values()) {
+            for (SavedFile file : savedFiles.values()) {
                 if (file.getFileId().equals(fileId)) {
                     // I have the chunk in my own file
-                    retChunk = file.getChunkList().get(chunkNo);
+                    rChunk = file.getChunkList().get(chunkNo);
                     break;
                 }
             }
         }
-*/
+
         return rChunk;
     }
     public synchronized void incChunkReplication(String fileId, int chunkNo)
@@ -126,5 +125,11 @@ public class Database implements Serializable {
         savedFiles.put(file.getFileId(),file);
 
         return file;
+    }
+
+    public void addChunk(Chunk chunk) {
+        synchronized (savedChunks){
+            savedChunks.add(chunk);
+        }
     }
 }
