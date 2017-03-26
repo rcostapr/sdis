@@ -25,11 +25,11 @@ public class MDBHandler implements Runnable {
     @Override
     public void run() {
         //TODO: TAKE ME OUT LATER JUST FOR TEST
-        System.out.println("MDB received a message");
 
         String[] header_parts = message.getHeader().split(" ");
         String messageType = header_parts[0].trim();
 
+        System.out.println("MDB received a " + messageType);
         switch (messageType){
             case "PUTCHUNK":
                 //putchunk
@@ -63,19 +63,19 @@ public class MDBHandler implements Runnable {
                     }
 
                     //if the chunk didnt get enough stored, then im storing it
-
                     if (actualChunk.getCurrentReplicationDeg() < actualChunk
                             .getWantedReplicationDegree()) {
 
+                        System.out.println("Not Enought stored, storing");
                         ChunkBackup.getInstance().storeChunk(actualChunk,
-                                message.getBody());
+                              message.getBody());
                     }
 
                     synchronized (MCListener.getInstance().pendingChunks) {
                         MCListener.getInstance().pendingChunks
                                 .remove(actualChunk);
                     }
-                    }
+                }
 
                 break;
             default:

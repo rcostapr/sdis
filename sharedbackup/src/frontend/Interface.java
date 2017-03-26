@@ -21,17 +21,20 @@ public class Interface {
 		return instance;
 	}
 
-	public void startUp(){
+	public void init (){
 		ConfigManager.getConfigManager().startupListeners();
+		ConfigManager.getConfigManager().saveDB();
 	}
+
 
 	public boolean backupFile(String filePath, int replication) throws SavedFile.FileDoesNotExistsException,
 			SavedFile.FileTooLargeException {
 		// TODO: add exceptions File too large, File already in system, File  does not exist
 
 		SavedFile file = new SavedFile(filePath, replication);
-		
-		file.showFileChunks();
+
+		//TODO: if fileSize + database.availableSpace > Max space, cancel
+		//file.showFileChunks();
 
 		FileBackup.getInstance().saveFile(file);
 

@@ -21,11 +21,15 @@ public class MCHandler implements Runnable {
         String[] headerParts  = mMessage.getHeader().split(" ");
 
         String messageType = headerParts[0].trim();
-        final String fileID;
-        final int chunkNR;
+        int messageID = Integer.parseInt(headerParts[2].trim());
+
+
 
         //TODO:TAKE ME OUT LATER, JUST FOR TESTING
-        System.out.println("Received Message: " + messageType);
+        System.out.println("Received Message: " + messageType + " from " + messageID);
+
+        final String fileID;
+        final int chunkNR;
 
 
         switch (messageType) {
@@ -33,23 +37,27 @@ public class MCHandler implements Runnable {
 
                 fileID = headerParts[3].trim();
                 chunkNR = Integer.parseInt(headerParts[4].trim());
-
+                //if the file is mine, ++ repCount of the chunk
                 try {
-                    //if the file is mine, ++ repCount of the chunk
+                    System.out.println("++REP Count");
                     ConfigManager.getConfigManager().incChunkReplication(fileID,
                             chunkNR);
                 } catch (ConfigManager.InvalidChunkException e) {
+                    e.printStackTrace();
+                }
 
-                    // if not my file, ++ the count of the chunks im pending
 
-                    synchronized (MCListener.getInstance().pendingChunks) {
-                        for (Chunk chunk : MCListener
-                                .getInstance().pendingChunks) {
-                            if (fileID.equals(chunk.getFileID())
-                                    && chunk.getChunkNo() == chunkNR) {
-                                chunk.incCurrentReplication();
-                            }
+                // if not my file, ++ the count of the chunks im pending
+
+                synchronized (MCListener.getInstance().pendingChunks) {
+                    for (Chunk chunk : MCListener
+                            .getInstance().pendingChunks) {
+                        if (fileID.equals(chunk.getFileID())
+                                && chunk.getChunkNo() == chunkNR) {
+
+                            chunk.incCurrentReplication();
                         }
+
                     }
                 }
                 break;

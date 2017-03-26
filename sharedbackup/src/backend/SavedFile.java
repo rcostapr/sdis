@@ -11,10 +11,6 @@ import java.util.ArrayList;
  */
 public class SavedFile implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	public static final long CHUNK_SIZE = 64000;
 	public static final long MAX_CHUNK = 1000000;
 	public static final long MAX_FILE = CHUNK_SIZE * (MAX_CHUNK - 1);

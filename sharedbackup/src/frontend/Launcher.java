@@ -19,13 +19,14 @@ public class Launcher {
 		String programName="";
 
 		String mcIP = null;
-		String mcPort= null;
+		int mcPort=81;
 
 		String mdbIP= null;
-		String mdbPort= null;
+		int mdbPort=82;
 
-		String mcrIP= null;
-		String mcrPort= null;
+		String mdrIP= null;
+		int mdrPort=83;
+
 
 		try {
 			program = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
@@ -45,7 +46,7 @@ public class Launcher {
 				String[] arr = args[3].split(":");
 				mcIP = arr[0];
 				try {
-					mcPort = arr[1];
+					mcPort = Integer.parseInt(arr[1]);
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
@@ -55,7 +56,8 @@ public class Launcher {
 				String[] arr = args[4].split(":");
 				mdbIP = arr[0];
 				try {
-					mdbPort= arr[1];
+					mdbPort= Integer.parseInt(arr[1]);
+
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
@@ -63,32 +65,25 @@ public class Launcher {
 
 			if (args[5].indexOf(':') > -1) { // <-- does it contain ":"?
 				String[] arr = args[5].split(":");
-				mcrIP= arr[0];
+				mdrIP= arr[0];
 				try {
-					mcrPort= arr[1];
+					mdrPort= Integer.parseInt(arr[1]);
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
 			}
 
-
+			//Check if DB is initialized
 
 			ConfigManager myConfig = ConfigManager.getConfigManager();
 			myConfig.setMyID(Integer.parseInt(args[1]));
 
 
-			try {
-				myConfig.setDBDestination("C:\\sdis\\f\\");
-			} catch (ConfigManager.InvalidFolderException e) {
-				e.printStackTrace();
-			}
 
-
-			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mcrIP, mcrPort)) {
-
-				Interface.getInstance().startUp();
+			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort)) {
+				Interface.getInstance().init();
 				try {
-					Interface.getInstance().backupFile("c:\\sdis\\test.txt", 2);
+					Interface.getInstance().backupFile("test.txt", 1);
 				} catch (SavedFile.FileTooLargeException ex) {
 
 				} catch (SavedFile.FileDoesNotExistsException ex1) {
@@ -96,7 +91,7 @@ public class Launcher {
 				}
 			}
 
-			myConfig.terminate();
+
 
 		}
 	}

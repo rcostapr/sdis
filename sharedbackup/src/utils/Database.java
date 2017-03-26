@@ -22,13 +22,12 @@ public class Database implements Serializable {
 
     private ArrayList<Chunk> savedChunks; // chunks from others
     private Map<String, SavedFile> savedFiles; // files from me
-    private boolean initialized;
+
 
     //private Map<String, Integer> mDeletedFiles;
 
     public Database() {
-        initialized = false;
-        maxBackupSize = 0;
+        maxBackupSize = 40*1000;
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = new ArrayList<Chunk>();
@@ -46,54 +45,7 @@ public class Database implements Serializable {
         if (space <= 0) {
             throw new ConfigManager.InvalidBackupSizeException();
         }
-
         maxBackupSize = space;
-
-        checkInitialization();
-    }
-
-    private void checkInitialization() {
-        if (!folder.equals("") && maxBackupSize != 0) {
-            initialized = true;
-            saveDatabase();
-        }
-    }
-    public String getFolder() {
-        return folder;
-    }
-
-    public synchronized void setFolder(String dest)
-            throws ConfigManager.InvalidFolderException {
-
-        File destination = new File(dest);
-        if (!destination.exists()) {
-
-            destination.mkdir();
-            folder = destination.getAbsolutePath();
-            String os = System.getProperty("os.name");
-
-            if (os.contains("Windows")) {
-                folder += "\\";
-            } else {
-                folder += "/";
-            }
-
-            checkInitialization();
-
-        } else if (destination.isDirectory()) {
-            folder = destination.getAbsolutePath();
-            String os = System.getProperty("os.name");
-
-            if (os.contains("Windows")) {
-                folder += "\\";
-            } else {
-                folder += "/";
-            }
-
-            checkInitialization();
-        } else {
-            throw new ConfigManager.InvalidFolderException();
-        }
     }
 
     public void saveDatabase() {

@@ -8,7 +8,7 @@ import java.net.SocketException;
 
 public class MulticastServer {
 
-	private static int TTL = 1;
+	private static int TTL = 2;
 
     public static final String ASCII_CODE = "US-ASCII";
 	private static int MAX_PACKET_SIZE  = 64000;
@@ -23,8 +23,7 @@ public class MulticastServer {
 	// Server Socket for communication
 	public MulticastSocket multicastSocket;
 
-	// Datagram packets to implement a connectionless packet delivery service
-	public DatagramPacket serverInfo;
+
 
 	public MulticastServer(InetAddress multicastAddress, int multicastPort){
 
@@ -39,16 +38,18 @@ public class MulticastServer {
 			multicastSocket.setTimeToLive(TTL);
 
 		} catch (IOException e) {
-			
+			System.out.println("Could not create MulticastSocket.");
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		try {
 			multicastSocket.joinGroup(multicastAddress);
 
 		} catch (IOException e) {
-			
+			System.out.println("Could not join multicast group.");
 			e.printStackTrace();
+			System.exit(1);
 
 		}
 		

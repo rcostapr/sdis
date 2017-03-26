@@ -58,14 +58,15 @@ public class ConfigManager {
 				database = (Database) in.readObject();
 			} catch (ClassNotFoundException e) {
 
-
+				System.out.println("Starting new DB");
 				database = new Database();
 			}
-
 			in.close();
 			fileIn.close();
 
 		} catch (FileNotFoundException e) {
+
+			System.out.println("Starting new DB");
 			database = new Database();
 			return false;
 		} catch (IOException e) {
@@ -74,20 +75,18 @@ public class ConfigManager {
 		return true;
 	}
 
-	public void setDBDestination(String path)throws InvalidFolderException{
-		database.setFolder(path);
-	}
 
-	public boolean setAdresses(String mcIP, String mcPort, String mdbIP, String mdbPort, String mdrIP, String mdrPort) {
+
+	public boolean setAdresses(String mcIP, int mcPort, String mdbIP, int mdbPort, String mdrIP, int mdrPort) {
 
 		try {
 			this.mcAddr = InetAddress.getByName(mcIP);
 			this.mdbAddr = InetAddress.getByName(mdbIP);
 			this.mdrAddr = InetAddress.getByName(mdrIP);
-
-			this.mMCport = Integer.parseInt(mcPort);
-			this.mMDBport = Integer.parseInt(mdbPort);
-			this.mMDRport = Integer.parseInt(mdrPort);
+			System.out.println("mcAddr = " + mdrAddr);
+			this.mMCport = mcPort;
+			this.mMDBport = mdbPort;
+			this.mMDRport = mdrPort;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return false;
@@ -162,6 +161,11 @@ public class ConfigManager {
 		database.incChunkReplication(fileId, chunkNo);
 		database.saveDatabase();
 	}
+
+	public void saveDB() {
+		database.saveDatabase();
+	}
+
 	public static class ConfigurationsNotInitializedException extends Exception {
 	}
 

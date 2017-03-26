@@ -86,32 +86,33 @@ public class ChunkBackup {
 
 	public boolean storeChunk(Chunk chunk, byte[] data) {
 
+
 		InetAddress multCtrlAddr = ConfigManager.getConfigManager().getMcAddr();
 		int multCtrlPort = ConfigManager.getConfigManager().getmMCport();
 
 		MulticastServer sender = new MulticastServer(multCtrlAddr, multCtrlPort);
 
 		// save chunk in file
-		chunk.saveToFile(data);
+		//chunk.saveToFile(data);
 
-		chunk.incCurrentReplication();
+		//chunk.incCurrentReplication();
 
 		// add chunk to database
-		ConfigManager.getConfigManager().addSavedChunk(chunk);
+		//ConfigManager.getConfigManager().addSavedChunk(chunk);
 
 		String message = null;
 
-		message = STORED_COMMAND + " " + chunk.getFileID() + " " + String.valueOf(chunk.getChunkNo())
+		message = STORED_COMMAND + " " + "1.0" + " " + ConfigManager.getConfigManager().getMyID()+ " "+ chunk.getFileID() + " " + String.valueOf(chunk.getChunkNo())
 				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
 		} catch (Exception e) {
+			System.out.println("FAILS");
 			e.printStackTrace();
-
-			System.out.println("Sent STORED command for chunk of file " + chunk.getFileID() + " no "
-					+ chunk.getChunkNo() + " with " + data.length + " bytes");
 		}
+		System.out.println("Sent STORED command for chunk of file " + chunk.getFileID() + " no "
+				+ chunk.getChunkNo() + " with " + data.length + " bytes");
 		return true;
 	}
 }
