@@ -1,16 +1,9 @@
 package frontend;
 
 import backend.ConfigManager;
-import backend.SavedFile;
-import utils.RMI_Interface;
-import utils.RMI_Server;
 
 import java.io.File;
 import java.net.*;
-import java.rmi.*;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 
 public class Launcher {
 
@@ -72,7 +65,6 @@ public class Launcher {
 					e.printStackTrace();
 				}
 			}
-
 			if (args[5].indexOf(':') > -1) { // <-- does it contain ":"?
 				String[] arr = args[5].split(":");
 				mcrIP = arr[0];
@@ -83,37 +75,18 @@ public class Launcher {
 				}
 			}
 
-
 			ConfigManager myConfig = ConfigManager.getConfigManager();
-			myConfig.setMyID(Integer.parseInt(args[1]));
-			myConfig.setRMI_Object_Name(args[2]);
 
-
-
-
-
-			try {
-				myConfig.setDBDestination("C:\\sdis\\f\\");
-			} catch (ConfigManager.InvalidFolderException e) {
-				e.printStackTrace();
-			}
-
+			System.out.println("args[2] = " + args[2]);
+			System.out.println("args[1] = " + args[1]);
+			Interface.getInstance().setAccessPoint(args[2]);
 
 			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mcrIP, mcrPort)) {
 
 				Interface.getInstance().startUp();
-				try {
-					Interface.getInstance().backupFile("\\test.txt", 2);
-				} catch (SavedFile.FileTooLargeException ex) {
-
-				} catch (SavedFile.FileDoesNotExistsException ex1) {
-					System.out.println("File does not exist!");
-				}
+				//Interface.getInstance().backupFile("\\test.txt", 2);
 
 			}
-
-			myConfig.terminate();
-
 		}
 	}
 }

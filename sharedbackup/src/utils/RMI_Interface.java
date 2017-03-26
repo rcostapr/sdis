@@ -8,5 +8,6 @@ import java.rmi.RemoteException;
  */
 public interface RMI_Interface extends Remote{
 
-    String sayHello() throws RemoteException;
+    String sayHello()throws RemoteException;
+    boolean backupFile(String filePath, int replication) throws RemoteException;
 }

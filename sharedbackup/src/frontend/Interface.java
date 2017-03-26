@@ -4,7 +4,6 @@ import backend.ConfigManager;
 import backend.FileBackup;
 import backend.SavedFile;
 import utils.RMI_Interface;
-import utils.RMI_Server;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,33 +13,14 @@ import java.rmi.server.UnicastRemoteObject;
 /**
  * Created by Duarte on 16-Mar-17.
  */
-public class Interface {
+public class Interface implements RMI_Interface{
 
 	private static Interface instance = null;
-
+	private String accessPoint;
 
 	private Interface() {
-		startRMI();
 	}
 
-	private void startRMI(){
-		//TODO:MY IP
-
-
-		try {
-
-			RMI_Interface engine = new RMI_Server();
-			//System.setProperty("java.rmi.server.hostname", "192.168.1.89");
-
-			RMI_Interface stub = (RMI_Interface) UnicastRemoteObject.exportObject(engine,0);
-
-			Registry reg = LocateRegistry.getRegistry();
-
-			reg.rebind(ConfigManager.getConfigManager().getRMI_Object_Name(),stub);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
 	public static Interface getInstance() {
 		if (instance == null) {
 			instance = new Interface();
@@ -49,15 +29,44 @@ public class Interface {
 	}
 
 	public void startUp(){
-		startRMI();
+		startRMI(accessPoint);
 		ConfigManager.getConfigManager().startupListeners();
 	}
 
-	public boolean backupFile(String filePath, int replication) throws SavedFile.FileDoesNotExistsException,
-			SavedFile.FileTooLargeException {
+	private void startRMI(String acessPoint) {
+		try {
+			RMI_Interface stub = (RMI_Interface) UnicastRemoteObject.exportObject(this,0);
+			Registry reg = null;
+			try {
+				reg = LocateRegistry.createRegistry(1090);
+			}
+			catch (RemoteException e)
+			{
+				System.out.println("RMI registry already running");
+				reg = LocateRegistry.getRegistry(1090);
+			}
+			reg.rebind(accessPoint, stub);
+		} catch (RemoteException e) {
+			System.out.println("FODEU");
+			e.printStackTrace();
+		}
+	}
+
+	public String sayHello()throws RemoteException{
+		return "Hello!";
+	}
+
+	public boolean backupFile(String filePath, int replication){
 		// TODO: add exceptions File too large, File already in system, File  does not exist
 
-		SavedFile file = new SavedFile(filePath, replication);
+		SavedFile file = null;
+		try {
+			file = new SavedFile(filePath, replication);
+		} catch (SavedFile.FileTooLargeException e) {
+			e.printStackTrace();
+		} catch (SavedFile.FileDoesNotExistsException e) {
+			e.printStackTrace();
+		}
 
 		file.showFileChunks();
 
@@ -66,6 +75,7 @@ public class Interface {
 		return true;
 	}
 
-
-
+	public void setAccessPoint(String accessPoint) {
+		this.accessPoint = accessPoint;
+	}
 }

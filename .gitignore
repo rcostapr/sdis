@@ -18,3 +18,5 @@ sharedbackup/src/META-INF/MANIFEST\.MF
 sharedbackup/metadata\.ser
 
 sharedbackup/Client/src/META-INF/MANIFEST\.MF
+
+*.MF

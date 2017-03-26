@@ -8,14 +8,16 @@ import java.rmi.registry.Registry;
  */
 public class Client {
 
+    static RMI_Interface stub;
     public static void main(String[] args) {
 
         String host = (args.length < 1) ? null : args[0];
 
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            RMI_Interface stub = (RMI_Interface) registry.lookup("Hello");
-            String response = stub.sayHello();
+            Registry registry = LocateRegistry.getRegistry(1090);
+            stub = (RMI_Interface) registry.lookup("RMI");
+
+            boolean response = stub.backupFile("test.txt", 1);
             System.out.println("response: " + response);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
