@@ -31,7 +31,12 @@ public class Interface {
 			SavedFile.FileTooLargeException {
 		// TODO: add exceptions File too large, File already in system, File  does not exist
 
-		SavedFile file = new SavedFile(filePath, replication);
+		SavedFile file = null;
+		try {
+			file = ConfigManager.getConfigManager().getNewSavedFile(filePath,replication);
+		} catch (ConfigManager.FileAlreadySaved fileAlreadySaved) {
+			fileAlreadySaved.printStackTrace();
+		}
 
 		//TODO: if fileSize + database.availableSpace > Max space, cancel
 		//file.showFileChunks();

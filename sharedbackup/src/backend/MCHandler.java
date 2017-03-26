@@ -39,9 +39,10 @@ public class MCHandler implements Runnable {
                 chunkNR = Integer.parseInt(headerParts[4].trim());
                 //if the file is mine, ++ repCount of the chunk
                 try {
-                    System.out.println("++REP Count");
                     ConfigManager.getConfigManager().incChunkReplication(fileID,
                             chunkNR);
+
+                    System.out.println("++REP Count");
                 } catch (ConfigManager.InvalidChunkException e) {
                     e.printStackTrace();
                 }

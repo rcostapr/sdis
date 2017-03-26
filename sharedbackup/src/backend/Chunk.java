@@ -1,14 +1,11 @@
 package backend;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by Duarte on 18-Mar-17.
  */
-public class Chunk {
+public class Chunk implements Serializable{
 
 	public static int MAX_CHUNK_SIZE = 64000;
 
