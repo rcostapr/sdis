@@ -114,4 +114,17 @@ public class Database implements Serializable {
             }
         }
     }
+
+    public SavedFile getNewSavedFile(String path, int replication) throws
+            SavedFile.FileTooLargeException,
+            SavedFile.FileDoesNotExistsException,
+            ConfigManager.FileAlreadySaved{
+        SavedFile file = new SavedFile(path,replication);
+        if (savedFiles.containsKey(file.getFileId())){
+            throw new ConfigManager.FileAlreadySaved();
+        }
+        savedFiles.put(file.getFileId(),file);
+
+        return file;
+    }
 }

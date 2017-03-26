@@ -25,7 +25,7 @@ public class ConfigManager {
 	private ExecutorService mExecutorService = null;
 
 	private boolean isDatabaseLoaded = false;
-	private Database database = null;
+	public Database database = null;
 
 	private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
 	private int mMCport = 0, mMDBport = 0, mMDRport = 0;
@@ -164,6 +164,11 @@ public class ConfigManager {
 
 	public void saveDB() {
 		database.saveDatabase();
+	}
+
+	public SavedFile getNewSavedFile(String path, int replication)
+			throws SavedFile.FileTooLargeException, FileAlreadySaved, SavedFile.FileDoesNotExistsException {
+		return database.getNewSavedFile(path, replication);
 	}
 
 	public static class ConfigurationsNotInitializedException extends Exception {

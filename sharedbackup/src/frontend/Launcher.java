@@ -77,11 +77,19 @@ public class Launcher {
 
 			ConfigManager myConfig = ConfigManager.getConfigManager();
 			myConfig.setMyID(Integer.parseInt(args[1]));
+			System.out.println("myConfig.database.getMaxBackupSize() = " + myConfig.database.getMaxBackupSize());
 
 
 
 			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort)) {
 				Interface.getInstance().init();
+				try {
+					myConfig.database.setAvailSpace(80*1000);
+					myConfig.saveDB();
+
+				} catch (ConfigManager.InvalidBackupSizeException e) {
+					e.printStackTrace();
+				}
 				try {
 					Interface.getInstance().backupFile("test.txt", 1);
 				} catch (SavedFile.FileTooLargeException ex) {
