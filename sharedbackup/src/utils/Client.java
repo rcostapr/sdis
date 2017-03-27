@@ -1,3 +1,5 @@
+package utils;
+
 import utils.RMI_Interface;
 
 import java.rmi.registry.LocateRegistry;
@@ -14,14 +16,14 @@ public class Client {
         String host = (args.length < 1) ? null : args[0];
 
         try {
-            Registry registry = LocateRegistry.getRegistry(1090);
+            Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
             stub = (RMI_Interface) registry.lookup("RMI");
 
-            String response = stub.sayHello();
-            //boolean response = stub.backupFile("test.txt", 1);
+           // String response = stub.sayHello();
+            boolean response = stub.backupFile("test.txt", 1);
             System.out.println("response: " + response);
          } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("utils.Client exception: " + e.toString());
             e.printStackTrace();
         }
     }
