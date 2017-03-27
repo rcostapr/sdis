@@ -1,6 +1,7 @@
 package backend;
 
 import utils.Message;
+import utils.Packet;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -42,13 +43,11 @@ public class MCListener implements Runnable{
             try {
                 //TODO: get a way to stop this
                 while (true){
-                    final byte[] message;
+                    final Packet messagePacket = receiver.receiveMessage();
 
-                    message = receiver.receiveMessage();
+                    Message receivedMessage = new Message(messagePacket.getMessage());
 
-                    Message receivedMessage = new Message(message);
-
-                    ConfigManager.getConfigManager().getExecutorService().execute(new MCHandler(receivedMessage));
+                    ConfigManager.getConfigManager().getExecutorService().execute(new MCHandler(receivedMessage,messagePacket.getIp()));
                 }
             }
                 catch(Exception e){

@@ -1,6 +1,7 @@
 package utils;
 
 import backend.Chunk;
+import backend.ChunkData;
 import backend.ConfigManager;
 import backend.SavedFile;
 
@@ -140,5 +141,30 @@ public class Database implements Serializable {
             }
         }
         return null;
+    }
+
+    public void print() {
+
+        //print MAX SPACE / USED SPACE
+        System.out.println("MY FILES:");
+        for (String key: savedFiles.keySet()
+             ) {
+            SavedFile file = savedFiles.get(key);
+            System.out.println("file = " + file.getFilePath());
+            System.out.println("FileId() = " + file.getFileId());
+            System.out.println("REP DEG = " + file.getWantedReplicationDegree());
+            file.showFileChunks();
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("Chunks Stored:");
+        System.out.println();
+        for (Chunk chunk:savedChunks
+             ) {
+            System.out.println("chunk ID = " + chunk.getFileID());
+            System.out.println("chunk size = " + chunk.getSize());
+            System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDeg());
+            System.out.println();
+        }
     }
 }

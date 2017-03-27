@@ -112,8 +112,9 @@ public class SavedFile implements Serializable {
 
 	public void showFileChunks() {
 		if (chunkCounter > 0 && chunkList.size() > 0) {
+			System.out.println();
 			for (int i = 0; i < chunkList.size(); i++)
-				System.out.println("Chunk Name: " + chunkList.get(i).getChunkName() + " Chunk No: " + chunkList.get(i).getChunkNo()
+				System.out.println("Chunk ID: " + chunkList.get(i).getFileID() + " Chunk No: " + chunkList.get(i).getChunkNo()
 						+ " Replication Degree: " + chunkList.get(i).getCurrentReplicationDegree());
 		}
 	}

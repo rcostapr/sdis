@@ -42,7 +42,8 @@ public class ChunkRestore {
 
 		String message = "";
 
-		message += GET_COMMAND + " " + fileId + " " + chunkNo + MulticastServer.CRLF + MulticastServer.CRLF;
+		//TODO: Make message
+		message += GET_COMMAND +ConfigManager.getConfigManager().getMyID() + " " + fileId + " " + chunkNo + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		InetAddress multCAddr = ConfigManager.getConfigManager().getMcAddr();
 		int multCPort = ConfigManager.getConfigManager().getmMCport();

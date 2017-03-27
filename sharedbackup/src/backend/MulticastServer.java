@@ -1,5 +1,7 @@
 package backend;
 
+import utils.Packet;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -85,7 +87,7 @@ public class MulticastServer {
 		return true;
 	}
 
-	public byte[] receiveMessage() throws Exception {
+	public Packet receiveMessage() throws Exception {
 
 		if (multicastSocket == null) {
 			throw new Exception();
@@ -107,7 +109,8 @@ public class MulticastServer {
 		
 		System.arraycopy(buffer, 0, message, 0, packet.getLength());
 
-		return message;
+
+		return new Packet(message,(packet.getAddress()).getHostAddress());
 	}
 
 }

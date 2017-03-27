@@ -13,10 +13,10 @@ public class Chunk implements Serializable{
 	private String fileID;
 	private long chunkNo;
 	private int currentReplicationDegree;
+	private int size=0;
 
 
 	private int wantedReplicationDegree;
-	private String chunkName;
 	private boolean isMyFile;
 
 	public Chunk(SavedFile tFile, long tChunkno) {
@@ -29,11 +29,13 @@ public class Chunk implements Serializable{
 		isMyFile = true;
 
 	}
-	public Chunk(String fileId, int chunkNo, int desiredReplication) {
+	public Chunk(String fileId, int chunkNo, int wantedReplication, int size) {
 		this.file = null;
 		this.chunkNo = chunkNo;
 		this.fileID = fileId;
-		this.wantedReplicationDegree = desiredReplication;
+		this.size= size;
+		currentReplicationDegree=0;
+		this.wantedReplicationDegree = wantedReplication;
 		isMyFile = false;
 	}
 
@@ -57,9 +59,6 @@ public class Chunk implements Serializable{
 		this.currentReplicationDegree = currentReplicationDegree;
 	}
 
-	public String getChunkName() {
-		return chunkName;
-	}
 
 	public String getFileID() {
 		return fileID;
@@ -69,13 +68,7 @@ public class Chunk implements Serializable{
 		this.fileID = fileID;
 	}
 
-	public String getPath(){
-		if (!isMyFile) {
-			return chunkName;
-		} else {
-			return file.getFilePath();
-		}
-	}
+	public int getSize(){return size;}
 
 	public byte[] getData() {
 
@@ -115,7 +108,7 @@ public class Chunk implements Serializable{
 				return null;
 			}
 		} else {
-			File newchunkfile = new File(getChunkName());
+			File newchunkfile = new File(String.valueOf(chunkNo));
 			FileInputStream in = null;
 			try {
 				in = new FileInputStream(newchunkfile);
@@ -167,8 +160,9 @@ public class Chunk implements Serializable{
 	}
 	public synchronized int incCurrentReplication() {
 		return ++currentReplicationDegree;
-
 	}
+
+	public void setSize(int size){this.size=size;}
 
 	public int getCurrentReplicationDeg() {
 		return currentReplicationDegree;

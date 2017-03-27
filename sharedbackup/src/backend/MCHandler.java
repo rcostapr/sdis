@@ -11,10 +11,11 @@ public class MCHandler implements Runnable {
     private Message mMessage;
     private Random random;
     private static final int TIMEOUT= 400;
-
-    public MCHandler(Message receivedMessage) {
+    private String IP;
+    public MCHandler(Message receivedMessage, String IP) {
         mMessage=receivedMessage;
         random = new Random();
+        this.IP=IP;
     }
 
     public void run(){
@@ -23,10 +24,8 @@ public class MCHandler implements Runnable {
         String messageType = headerParts[0].trim();
         int messageID = Integer.parseInt(headerParts[2].trim());
 
-
-
         //TODO:TAKE ME OUT LATER, JUST FOR TESTING
-        System.out.println("Received Message: " + messageType + " from " + messageID);
+        System.out.println("MC Received Message: " + messageType + " from " + messageID);
 
         final String fileID;
         final int chunkNR;
@@ -38,16 +37,19 @@ public class MCHandler implements Runnable {
                 fileID = headerParts[3].trim();
                 chunkNR = Integer.parseInt(headerParts[4].trim());
                 //if the file is mine, ++ repCount of the chunk
-                try {
-                    ConfigManager.getConfigManager().incChunkReplication(fileID,
-                            chunkNR);
-                } catch (ConfigManager.InvalidChunkException e) {
-                    e.printStackTrace();
+
+                if (messageID != ConfigManager.getConfigManager().getMyID()) {
+                    try {
+                        ConfigManager.getConfigManager().incChunkReplication(fileID,
+                                chunkNR);
+                    } catch (ConfigManager.InvalidChunkException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-
-
                 // if not my file, ++ the count of the chunks im pending
 
+                else {
                 synchronized (MCListener.getInstance().pendingChunks) {
                     for (Chunk chunk : MCListener
                             .getInstance().pendingChunks) {
@@ -56,7 +58,7 @@ public class MCHandler implements Runnable {
 
                             chunk.incCurrentReplication();
                         }
-
+                    }
                     }
                 }
                 break;

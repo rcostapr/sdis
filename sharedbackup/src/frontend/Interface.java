@@ -111,4 +111,8 @@ public class Interface implements RMI_Interface{
 		return false;
 	}
 
+	public boolean state(){
+		ConfigManager.getConfigManager().printState();
+		return true;
+	}
 }

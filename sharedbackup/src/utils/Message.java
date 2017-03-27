@@ -3,6 +3,7 @@ package utils;
 import backend.MulticastServer;
 
 import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
 import java.util.Arrays;
 
 /**
@@ -12,9 +13,9 @@ public class Message {
 
 	private String header;
 	private byte[] body;
-
 	public Message(byte[] msg) {
 		byte[] headerEnd = null;
+
 
 		try {
 			headerEnd = new String(MulticastServer.CRLF + MulticastServer.CRLF).getBytes(MulticastServer.ASCII_CODE);

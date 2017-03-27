@@ -187,6 +187,11 @@ public class ConfigManager {
 		return RMI_Object_Name;
 	}
 
+	public void printState() {
+
+		database.print();
+	}
+
 	public static class ConfigurationsNotInitializedException extends Exception {
 	}
 

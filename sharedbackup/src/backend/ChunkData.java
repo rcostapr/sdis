@@ -7,7 +7,7 @@ public class ChunkData extends Chunk{
     private byte[] data;
 
     public ChunkData(String fileID, int chunkNR, byte[] data){
-        super(fileID,chunkNR,0);
+        super(fileID,chunkNR,0,data.length);
 
         this.data = data;
     }
@@ -15,6 +15,7 @@ public class ChunkData extends Chunk{
     public byte[] getData() {
         return data;
     }
+
 
     public void setData(byte[] data) {
         this.data = data;

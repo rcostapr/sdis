@@ -49,7 +49,7 @@ public class MDBHandler implements Runnable {
                 Chunk chunkOBJ = ConfigManager.getConfigManager().getSavedChunk(fileID,chunkNo);
 
                 if (chunkOBJ == null){
-                    Chunk actualChunk = new Chunk(fileID,chunkNo,wantedReplication);
+                    Chunk actualChunk = new Chunk(fileID,chunkNo,wantedReplication,0);
 
                     synchronized (MCListener.getInstance().pendingChunks) {
                         MCListener.getInstance().pendingChunks
@@ -64,8 +64,7 @@ public class MDBHandler implements Runnable {
                     //if the chunk didnt get enough stored, then im storing it
                     if (actualChunk.getCurrentReplicationDeg() < actualChunk
                             .getWantedReplicationDegree()) {
-
-                        System.out.println("Not Enought stored, storing");
+                        actualChunk.setSize(message.getBody().length);
                         ChunkBackup.getInstance().storeChunk(actualChunk,
                               message.getBody());
                     }

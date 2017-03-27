@@ -1,6 +1,7 @@
 package backend;
 
 import utils.Message;
+import utils.Packet;
 
 import java.net.InetAddress;
 
@@ -34,11 +35,9 @@ public class MDBListener implements Runnable{
         try {
             //TODO: get a way to stop this
             while (true){
-                final byte[] message;
+                final Packet messagePacket = receiver.receiveMessage();
 
-                message = receiver.receiveMessage();
-
-                Message receivedMessage = new Message(message);
+                Message receivedMessage = new Message(messagePacket.getMessage());
 
                 ConfigManager.getConfigManager().getExecutorService().execute(new MDBHandler(receivedMessage));
             }

@@ -30,8 +30,10 @@ public class FileRestore {
         for (Chunk chunk:file.getChunkList()) {
             receivedChunks.add(ChunkRestore.getInstance().requestChunk(chunk.getFileID(),chunk.getChunkNo()));
         }
-
-        return rebuildFile(file,receivedChunks);
+        if (receivedChunks.size() == file.getChunkList().size()){
+            return rebuildFile(file,receivedChunks);
+        }
+        else return false;
     }
 
     private boolean rebuildFile(SavedFile file, ArrayList<ChunkData> chunks) {

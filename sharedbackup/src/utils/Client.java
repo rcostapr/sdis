@@ -58,11 +58,15 @@ public class Client {
                 break;
 
             case "DELETE":
-                //
+
                 break;
 
             case "STATE":
-                //
+                try {
+                    stub.state();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "RECLAIM":
                 //

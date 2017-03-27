@@ -1,6 +1,7 @@
 package backend;
 
 import utils.Message;
+import utils.Packet;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -8,9 +9,10 @@ import java.util.ArrayList;
 public class MDRListener implements Runnable{
     private static MDRListener mdrListener = null;
 
-    public ArrayList<ChunkRecord> mSubscribedChunks;
+    public ArrayList<ChunkRecord> subscribedChunks;
     
     private MDRListener() {
+        subscribedChunks = new ArrayList<ChunkRecord>();
     }
 
     public static MDRListener getInstance(){
@@ -33,11 +35,9 @@ public class MDRListener implements Runnable{
         try {
             //TODO: get a way to stop this
             while (true){
-                final byte[] message;
+                final Packet messagePacket = receiver.receiveMessage();
 
-                message = receiver.receiveMessage();
-
-                Message receivedMessage = new Message(message);
+                Message receivedMessage = new Message(messagePacket.getMessage());
 
                 ConfigManager.getConfigManager().getExecutorService().execute(new MDRHandler(receivedMessage));
             }
@@ -48,7 +48,7 @@ public class MDRListener implements Runnable{
     }
     
     public synchronized void subscribeToChunkData(String fileId, long chunkNo) {
-        mSubscribedChunks.add(new ChunkRecord(fileId, (int) chunkNo));
+        subscribedChunks.add(new ChunkRecord(fileId, (int) chunkNo));
     }
 }
 
