@@ -3,11 +3,13 @@ package backend;
 import utils.Message;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 
 public class MDRListener implements Runnable{
     private static MDRListener mdrListener = null;
 
-
+    public ArrayList<ChunkRecord> mSubscribedChunks;
+    
     private MDRListener() {
     }
 
@@ -43,6 +45,10 @@ public class MDRListener implements Runnable{
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+    
+    public synchronized void subscribeToChunkData(String fileId, long chunkNo) {
+        mSubscribedChunks.add(new ChunkRecord(fileId, (int) chunkNo));
     }
 }
 
