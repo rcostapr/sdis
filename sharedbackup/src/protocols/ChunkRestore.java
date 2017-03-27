@@ -8,10 +8,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-import backend.Chunk;
-import backend.ConfigManager;
-import backend.MDRListener;
-import backend.MulticastServer;
+import backend.*;
 
 public class ChunkRestore {
 
@@ -25,7 +22,7 @@ public class ChunkRestore {
 	public static final int ENHANCEMENT_RESPONSE_PORT = 50556;
 	private static final int REQUEST_TIME_INTERVAL = 500;
 
-	private ArrayList<Chunk> mRequestedChunks;
+	private ArrayList<ChunkData> mRequestedChunks;
 
 	public static ChunkRestore getInstance() {
 
@@ -36,12 +33,12 @@ public class ChunkRestore {
 	}
 
 	private ChunkRestore() {
-		mRequestedChunks = new ArrayList<Chunk>();
+		mRequestedChunks = new ArrayList<ChunkData>();
 	}
 
-	public Chunk requestChunk(String fileId, long chunkNo) {
+	public ChunkData requestChunk(String fileId, long chunkNo) {
 
-		Chunk retChunk = null;
+		ChunkData retChunk = null;
 
 		String message = "";
 
@@ -69,7 +66,7 @@ public class ChunkRestore {
 			}
 
 			synchronized (mRequestedChunks) {
-				for (Chunk chunk : mRequestedChunks) {
+				for (ChunkData chunk : mRequestedChunks) {
 					if (chunk.getFileID().equals(fileId) && chunk.getChunkNo() == chunkNo) {
 						retChunk = chunk;
 						mRequestedChunks.remove(chunk);
@@ -197,7 +194,7 @@ public class ChunkRestore {
 		System.out.println("Answered to CHUNK command to IP");
 	}
 
-	public synchronized void addRequestedChunk(Chunk chunk) {
+	public synchronized void addRequestedChunk(ChunkData chunk) {
 		mRequestedChunks.add(chunk);
 	}
 }

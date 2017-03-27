@@ -132,4 +132,13 @@ public class Database implements Serializable {
             savedChunks.add(chunk);
         }
     }
+
+    public SavedFile getFileByPath(String path){
+        for (SavedFile file : savedFiles.values()) {
+            if (file.getFilePath().equals(path)) {
+                return file;
+            }
+        }
+        return null;
+    }
 }

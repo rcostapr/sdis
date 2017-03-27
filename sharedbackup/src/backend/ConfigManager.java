@@ -178,6 +178,10 @@ public class ConfigManager {
 		return database.getNewSavedFile(path, replication);
 	}
 
+	public SavedFile getFileByPath(String path){
+		return database.getFileByPath(path);
+	}
+
 
 	public String getRMI_Object_Name() {
 		return RMI_Object_Name;

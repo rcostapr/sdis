@@ -1,8 +1,7 @@
 package frontend;
 
-import backend.ConfigManager;
-import backend.FileBackup;
-import backend.SavedFile;
+import backend.*;
+import protocols.ChunkRestore;
 import utils.RMI_Interface;
 
 import java.io.File;
@@ -96,4 +95,20 @@ public class Interface implements RMI_Interface{
 	public void setAccessPoint(String accessPoint) {
 		this.accessPoint = accessPoint;
 	}
+
+	public boolean restoreFile(String filePath){
+
+		SavedFile fileToRestore = ConfigManager.getConfigManager().getFileByPath(filePath);
+
+
+		if (fileToRestore != null	){
+
+			FileRestore.getInstance().restoreFile(fileToRestore);
+
+
+			//TODO: Rebuild file from chunks
+		}
+		return false;
+	}
+
 }

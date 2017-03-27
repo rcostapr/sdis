@@ -11,7 +11,7 @@ public class Launcher {
 		//args:
 		//Protocol Version ,server id, server AP , MC:Port, MDB:Port, MDR:port
 
-		// TODO Auto-generated method stub
+
 		// String fileTosave = args[1];
 		// int replication = Integer.parseInt(args[2]);
 		File program;
