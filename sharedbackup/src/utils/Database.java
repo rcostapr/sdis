@@ -90,6 +90,7 @@ public class Database implements Serializable {
     public synchronized void incChunkReplication(String fileId, int chunkNo)
             throws ConfigManager.InvalidChunkException {
         SavedFile file = savedFiles.get(fileId);
+        System.out.println("size = " + savedFiles.size());
         if (file != null) {
             // This is the owner machine of chunk's parent file
             file.incChunkReplication(chunkNo);
@@ -104,7 +105,6 @@ public class Database implements Serializable {
                     break;
                 }
             }
-
             if (chunk != null) {
                 chunk.incCurrentReplication();
 

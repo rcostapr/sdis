@@ -24,11 +24,8 @@ public class SavedFile implements Serializable {
 
 	private int wantedReplicationDegree;
 
-	public SavedFile(String filePath, int desiredReplicationDegree) throws FileTooLargeException, FileDoesNotExistsException {
+	public SavedFile(String filePath, int desiredReplicationDegree){
 		this.filePath = filePath;
-
-		validateFile();
-
 		wantedReplicationDegree = desiredReplicationDegree;
 
 		fileId = generateID(new File(filePath));
@@ -87,21 +84,6 @@ public class SavedFile implements Serializable {
 		return builder.toString();
 	}
 
-
-	private void validateFile() throws FileTooLargeException, FileDoesNotExistsException {
-
-		// exists
-
-		if (!new File(filePath).exists()) {
-			throw new FileDoesNotExistsException();
-		}
-
-		// not too big
-
-		if (getFileSize() > MAX_FILE) {
-			throw new FileTooLargeException();
-		}
-	}
 
 	public String getFileId() {
 		return fileId;

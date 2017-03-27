@@ -5,6 +5,7 @@ import backend.FileBackup;
 import backend.SavedFile;
 import utils.RMI_Interface;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -39,12 +40,12 @@ public class Interface implements RMI_Interface{
 			RMI_Interface stub = (RMI_Interface) UnicastRemoteObject.exportObject(this,0);
 			Registry reg = null;
 			try {
-				reg = LocateRegistry.createRegistry(1090);
+				reg = LocateRegistry.createRegistry(RMI_Interface.RMI_PORT);
 			}
 			catch (RemoteException e)
 			{
 				System.out.println("RMI registry already running");
-				reg = LocateRegistry.getRegistry(1090);
+				reg = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
 			}
 			reg.rebind(accessPoint, stub);
 		} catch (RemoteException e) {
@@ -58,25 +59,38 @@ public class Interface implements RMI_Interface{
 	}
 
 	public boolean backupFile(String filePath, int replication){
-		// TODO: add exceptions File too large, File already in system, File  does not exist
 
-		SavedFile file = null;
-		try {
-			file = new SavedFile(filePath, replication);
-		} catch (SavedFile.FileTooLargeException e) {
-			e.printStackTrace();
-		} catch (SavedFile.FileDoesNotExistsException e) {
-			e.printStackTrace();
+		if (validateFile(filePath)) {
+			SavedFile file = null;
+			try {
+				file = ConfigManager.getConfigManager().getNewSavedFile(filePath,replication);
+			} catch (SavedFile.FileTooLargeException e) {
+				e.printStackTrace();
+			} catch (ConfigManager.FileAlreadySaved fileAlreadySaved) {
+				fileAlreadySaved.printStackTrace();
+			} catch (SavedFile.FileDoesNotExistsException e) {
+				e.printStackTrace();
+			}
+			//file.showFileChunks();
+
+			//TODO: if fileSize + database.availableSpace > Max space, cancel
+			//file.showFileChunks();
+
+			return FileBackup.getInstance().saveFile(file);
+
+		}else{
+			return false;}
+	}
+
+	private boolean validateFile(String path){
+		// exists
+		File f = new File(path);
+		if ( f.exists()) {
+			if (f.length() < SavedFile.MAX_FILE) {
+				return true;
+			}
 		}
-
-		file.showFileChunks();
-
-		//TODO: if fileSize + database.availableSpace > Max space, cancel
-		//file.showFileChunks();
-
-		FileBackup.getInstance().saveFile(file);
-
-		return true;
+		return false;
 	}
 
 	public void setAccessPoint(String accessPoint) {

@@ -18,7 +18,6 @@ public class ConfigManager {
 	private MCListener mcListener;
 
 
-
 	private int myID;
 	private MDRListener mdrListener;
 	private MDBListener mdbListener;
@@ -62,7 +61,7 @@ public class ConfigManager {
 				database = (Database) in.readObject();
 			} catch (ClassNotFoundException e) {
 
-				System.out.println("Starting new DB");
+				//System.out.println("Starting new DB");
 				database = new Database();
 			}
 			in.close();
@@ -70,7 +69,7 @@ public class ConfigManager {
 
 		} catch (FileNotFoundException e) {
 
-			System.out.println("Starting new DB");
+			//System.out.println("Starting new DB");
 			database = new Database();
 			return false;
 		} catch (IOException e) {

@@ -81,7 +81,6 @@ public class Chunk implements Serializable{
 
 		if (isMyFile) {
 			if (file.exists()) {
-
 				int offset = (int) (SavedFile.CHUNK_SIZE * chunkNo);
 
 				int chunkSize = (int) Math.min(SavedFile.CHUNK_SIZE,

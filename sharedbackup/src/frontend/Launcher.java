@@ -17,12 +17,6 @@ public class Launcher {
 		File program;
 		String programName="";
 
-		try {
-			System.out.println(java.net.InetAddress.getLocalHost());
-		} catch (java.net.UnknownHostException e) {
-			e.printStackTrace();
-		}
-
 		String mcIP = null;
 		int mcPort=81;
 
@@ -81,18 +75,17 @@ public class Launcher {
 
 			ConfigManager myConfig = ConfigManager.getConfigManager();
 			myConfig.setMyID(Integer.parseInt(args[1]));
-			System.out.println("myConfig.database.getMaxBackupSize() = " + myConfig.database.getMaxBackupSize());
-
-			System.out.println("args[2] = " + args[2]);
-			System.out.println("args[1] = " + args[1]);
 			Interface.getInstance().setAccessPoint(args[2]);
 
 			if (myConfig.setAdresses(mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort)) {
 
+
 				Interface.getInstance().startUp();
-				//Interface.getInstance().backupFile("\\test.txt", 2);
+
+				//Interface.getInstance().backupFile("\\test.txt", 1);
 
 			}
+			while (true);
 		}
 	}
 }
