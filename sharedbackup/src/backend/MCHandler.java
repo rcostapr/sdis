@@ -1,5 +1,6 @@
 package backend;
 
+import protocols.ChunkRestore;
 import utils.Message;
 
 import java.util.Random;
@@ -50,21 +51,47 @@ public class MCHandler implements Runnable {
                 // if not my file, ++ the count of the chunks im pending
 
                 else {
-                synchronized (MCListener.getInstance().pendingChunks) {
-                    for (Chunk chunk : MCListener
-                            .getInstance().pendingChunks) {
-                        if (fileID.equals(chunk.getFileID())
-                                && chunk.getChunkNo() == chunkNR) {
+                    synchronized (MCListener.getInstance().pendingChunks) {
+                        for (Chunk chunk : MCListener
+                                .getInstance().pendingChunks) {
+                            if (fileID.equals(chunk.getFileID())
+                                    && chunk.getChunkNo() == chunkNR) {
 
-                            chunk.incCurrentReplication();
+                                chunk.incCurrentReplication();
+                            }
                         }
-                    }
                     }
                 }
                 break;
             case "GETCHUNK":
-                //getchunk
+                fileID = headerParts[3].trim();
+                chunkNR = Integer.parseInt(headerParts[4].trim());
+
+                Chunk chunkToGet = ConfigManager.getConfigManager().getSavedChunk(fileID,chunkNR);
+
+                if (messageID != ConfigManager.getConfigManager().getMyID()) {
+                    //if I don't store the chunk I don't care about the rest
+                    if (chunkToGet != null){
+                        ChunkRecord record = new ChunkRecord(fileID,chunkNR);
+                        synchronized (MCListener.getInstance().watchedChunk){
+                            MCListener.getInstance().watchedChunk.add(record);
+                        }
+                        try {
+                            Thread.sleep(random.nextInt(TIMEOUT));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //If no one responded to the GET, then I will do it
+                        if (!record.isServed){
+
+                            ChunkRestore.getInstance().sendChunk(chunkToGet);
+                        }
+                        MCListener.getInstance().watchedChunk.remove(record);
+                    }
+                }
                 break;
+
+
             case "DELETE":
                 //delete
                 break;

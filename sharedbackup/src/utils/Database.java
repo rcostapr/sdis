@@ -51,7 +51,6 @@ public class Database implements Serializable {
 
     public void saveDatabase() {
         try {
-
             FileOutputStream fileOut = new FileOutputStream("metadata.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(this);
@@ -147,9 +146,8 @@ public class Database implements Serializable {
 
         //print MAX SPACE / USED SPACE
         System.out.println("MY FILES:");
-        for (String key: savedFiles.keySet()
-             ) {
-            SavedFile file = savedFiles.get(key);
+        for (SavedFile file: savedFiles.values()
+                ) {
             System.out.println("file = " + file.getFilePath());
             System.out.println("FileId() = " + file.getFileId());
             System.out.println("REP DEG = " + file.getWantedReplicationDegree());
@@ -160,11 +158,21 @@ public class Database implements Serializable {
         System.out.println("Chunks Stored:");
         System.out.println();
         for (Chunk chunk:savedChunks
-             ) {
+                ) {
             System.out.println("chunk ID = " + chunk.getFileID());
             System.out.println("chunk size = " + chunk.getSize());
             System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDeg());
             System.out.println();
         }
+    }
+
+    public boolean isChunkBackedUP(String fileID, int chunkNR){
+        for (Chunk chunk:savedChunks
+                ) {
+            if (chunk.getFileID().equals(fileID) && chunk.getChunkNo() == chunkNR){
+                return true;
+            }
+        }
+        return false;
     }
 }

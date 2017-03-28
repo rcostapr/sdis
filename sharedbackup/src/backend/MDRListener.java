@@ -10,14 +10,14 @@ public class MDRListener implements Runnable{
     private static MDRListener mdrListener = null;
 
     public ArrayList<ChunkRecord> subscribedChunks;
-    
+
     private MDRListener() {
         subscribedChunks = new ArrayList<ChunkRecord>();
     }
 
     public static MDRListener getInstance(){
         if (mdrListener==null){
-        	mdrListener= new MDRListener();
+            mdrListener= new MDRListener();
         }
         return mdrListener;
     }
@@ -46,9 +46,14 @@ public class MDRListener implements Runnable{
             e.printStackTrace();
         }
     }
-    
+
     public synchronized void subscribeToChunkData(String fileId, long chunkNo) {
         subscribedChunks.add(new ChunkRecord(fileId, (int) chunkNo));
     }
+
+    public synchronized void unsubscribeToChunkData (String fileId, long chunkNo) {
+
+    }
+
 }
 

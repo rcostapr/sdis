@@ -22,7 +22,7 @@ public class ChunkRestore {
 	public static final int ENHANCEMENT_RESPONSE_PORT = 50556;
 	private static final int REQUEST_TIME_INTERVAL = 500;
 
-	private ArrayList<ChunkData> mRequestedChunks;
+	private final ArrayList<ChunkData> mRequestedChunks;
 
 	public static ChunkRestore getInstance() {
 
@@ -43,7 +43,7 @@ public class ChunkRestore {
 		String message = "";
 
 		//TODO: Make message
-		message += GET_COMMAND +ConfigManager.getConfigManager().getMyID() + " " + fileId + " " + chunkNo + MulticastServer.CRLF + MulticastServer.CRLF;
+		message += GET_COMMAND +" " + "1.0"+ " " + ConfigManager.getConfigManager().getMyID() + " " + fileId + " " + chunkNo + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		InetAddress multCAddr = ConfigManager.getConfigManager().getMcAddr();
 		int multCPort = ConfigManager.getConfigManager().getmMCport();
@@ -59,13 +59,12 @@ public class ChunkRestore {
 				sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
 			} catch (Exception e) {
 				e.printStackTrace();
-			} 
+			}
 			try {
 				Thread.sleep(REQUEST_TIME_INTERVAL);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
 			synchronized (mRequestedChunks) {
 				for (ChunkData chunk : mRequestedChunks) {
 					if (chunk.getFileID().equals(fileId) && chunk.getChunkNo() == chunkNo) {
@@ -88,7 +87,7 @@ public class ChunkRestore {
 
 		String header = "";
 
-		header += CHUNK_COMMAND + " " + chunk.getFileID() + " " + chunk.getChunkNo() + MulticastServer.CRLF
+		header += CHUNK_COMMAND + " " + "1.0" + " " + ConfigManager.getConfigManager().getMyID()+" " + chunk.getFileID() + " " + chunk.getChunkNo() + MulticastServer.CRLF
 				+ MulticastServer.CRLF;
 
 		byte[] data = chunk.getData();
@@ -111,7 +110,7 @@ public class ChunkRestore {
 			e.printStackTrace();
 		}
 
-		System.out.println("Sent CHUNK command to MULTICAST in response to request of " + chunk.getFileID() + " no " + chunk.getChunkNo());
+		System.out.println("Sent CHUNK of " + chunk.getFileID() + " no " + chunk.getChunkNo());
 
 		return true;
 	}

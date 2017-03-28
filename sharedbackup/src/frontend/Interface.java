@@ -103,10 +103,10 @@ public class Interface implements RMI_Interface{
 
 		if (fileToRestore != null	){
 
-			FileRestore.getInstance().restoreFile(fileToRestore);
+			return FileRestore.getInstance().restoreFile(fileToRestore);
 
 
-			//TODO: Rebuild file from chunks
+
 		}
 		return false;
 	}

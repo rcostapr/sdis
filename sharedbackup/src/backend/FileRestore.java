@@ -28,9 +28,13 @@ public class FileRestore {
         ArrayList<ChunkData> receivedChunks = new ArrayList<ChunkData>();
 
         for (Chunk chunk:file.getChunkList()) {
-            receivedChunks.add(ChunkRestore.getInstance().requestChunk(chunk.getFileID(),chunk.getChunkNo()));
+            ChunkData chunkData = ChunkRestore.getInstance().requestChunk(chunk.getFileID(),chunk.getChunkNo());
+            if(chunkData != null){
+                receivedChunks.add(chunkData);
+            }
         }
         if (receivedChunks.size() == file.getChunkList().size()){
+            System.out.println("GOT ALL THE CHUNKS, REBUILDING");
             return rebuildFile(file,receivedChunks);
         }
         else return false;
@@ -44,6 +48,7 @@ public class FileRestore {
                 return false;
             }
         }
+        System.out.println("REBUILD DONE");
         return true;
     }
 
@@ -60,7 +65,6 @@ public class FileRestore {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 }

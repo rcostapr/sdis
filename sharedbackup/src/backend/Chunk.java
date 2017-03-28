@@ -107,8 +107,9 @@ public class Chunk implements Serializable{
 			} else {
 				return null;
 			}
-		} else {
-			File newchunkfile = new File(String.valueOf(chunkNo));
+		}
+		else {
+			File newchunkfile = new File(fileID+"/"+String.valueOf(chunkNo));
 			FileInputStream in = null;
 			try {
 				in = new FileInputStream(newchunkfile);
@@ -132,7 +133,6 @@ public class Chunk implements Serializable{
 				System.out.println("FILE DIR DIDNT EXIST");
 			out = new FileOutputStream(f);
 		} catch (FileNotFoundException e) {
-			System.out.println("merda1");
 			e.printStackTrace();
 			return false;
 		}
@@ -140,13 +140,11 @@ public class Chunk implements Serializable{
 			out.write(data);
 		} catch (IOException e) {
 
-			System.out.println("merda");
 			e.printStackTrace();
 			try {
 				out.close();
 			} catch (IOException e1) {
 
-				System.out.println("merda2");
 				e1.printStackTrace();
 			}
 			return false;

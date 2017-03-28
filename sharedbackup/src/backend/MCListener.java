@@ -13,6 +13,7 @@ public class MCListener implements Runnable{
 
 
     public ArrayList<Chunk> pendingChunks;
+    public ArrayList<ChunkRecord> watchedChunk;
 
     private static MCListener mcListener = null;
 
@@ -20,7 +21,7 @@ public class MCListener implements Runnable{
     private MCListener() {
 
         pendingChunks = new ArrayList<Chunk>();
-
+        watchedChunk = new ArrayList<ChunkRecord>();
     }
 
     public static MCListener getInstance(){
@@ -37,21 +38,30 @@ public class MCListener implements Runnable{
         int port = ConfigManager.getConfigManager().getmMCport();
 
 
-            MulticastServer receiver = new MulticastServer(addr , port);
-            receiver.join();
+        MulticastServer receiver = new MulticastServer(addr , port);
+        receiver.join();
 
-            try {
-                //TODO: get a way to stop this
-                while (true){
-                    final Packet messagePacket = receiver.receiveMessage();
+        try {
+            //TODO: get a way to stop this
+            while (true){
+                final Packet messagePacket = receiver.receiveMessage();
 
-                    Message receivedMessage = new Message(messagePacket.getMessage());
+                Message receivedMessage = new Message(messagePacket.getMessage());
 
-                    ConfigManager.getConfigManager().getExecutorService().execute(new MCHandler(receivedMessage,messagePacket.getIp()));
-                }
+                ConfigManager.getConfigManager().getExecutorService().execute(new MCHandler(receivedMessage,messagePacket.getIp()));
             }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void servedChunk (String fileID , int chunkNR){
+        for (ChunkRecord record:watchedChunk
+                ) {
+            if (record.fileId.equals(fileID) && record.chunkNo == chunkNR){
+                record.isServed = true;
+            }
+        }
     }
 }
