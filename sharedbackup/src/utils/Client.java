@@ -1,5 +1,6 @@
 package utils;
 
+import com.sun.org.apache.regexp.internal.RE;
 import utils.RMI_Interface;
 
 import java.rmi.RemoteException;
@@ -20,8 +21,6 @@ public class Client {
         try {
             Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
             stub = (RMI_Interface) registry.lookup(args[0]);
-
-
         } catch (Exception e) {
             System.err.println("utils.Client exception: " + e.toString());
             e.printStackTrace();
@@ -40,7 +39,7 @@ public class Client {
             case "BACKUP":
                 boolean response = false;
                 try {
-                    response = stub.backupFile("test.txt", 1);
+                    response = stub.backupFile("test.pdf", 1);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -50,7 +49,7 @@ public class Client {
             case "RESTORE":
                 response = false;
                 try {
-                    response = stub.restoreFile("test.txt");
+                    response = stub.restoreFile("test.pdf");
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -58,7 +57,13 @@ public class Client {
                 break;
 
             case "DELETE":
-
+                response = false;
+                try {
+                    response = stub.deleteFile("test.pdf");
+                } catch (RemoteException e){
+                    e.printStackTrace();
+                }
+                System.out.println("response: "+ response);
                 break;
 
             case "STATE":

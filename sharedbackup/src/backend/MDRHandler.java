@@ -24,25 +24,27 @@ public class MDRHandler implements Runnable {
         String[] header_parts = message.getHeader().split(" ");
         String messageType = header_parts[0].trim();
 
-        switch (messageType){
-            case "CHUNK":
-                int senderID = Integer.parseInt(header_parts[2].trim());
-                String fileID = header_parts[3].trim();
-                int chunkNR = Integer.parseInt(header_parts[4].trim());
+        if (header_parts[1].trim().equals("1.0")){
+            switch (messageType){
+                case "CHUNK":
+                    int senderID = Integer.parseInt(header_parts[2].trim());
+                    String fileID = header_parts[3].trim();
+                    int chunkNR = Integer.parseInt(header_parts[4].trim());
 
-                for (ChunkRecord record: MDRListener.getInstance().subscribedChunks
-                        ) {
-                    if (record.fileId.equals(fileID) && record.chunkNo == chunkNR){
-                        ChunkData wantedChunk = new ChunkData(fileID,chunkNR,message.getBody());
-                        ChunkRestore.getInstance().addRequestedChunk(wantedChunk);
-                        MDRListener.getInstance().subscribedChunks.remove(record);
-                        break;
+                    for (ChunkRecord record: MDRListener.getInstance().subscribedChunks
+                            ) {
+                        if (record.fileId.equals(fileID) && record.chunkNo == chunkNR){
+                            ChunkData wantedChunk = new ChunkData(fileID,chunkNR,message.getBody());
+                            ChunkRestore.getInstance().addRequestedChunk(wantedChunk);
+                            MDRListener.getInstance().subscribedChunks.remove(record);
+                            break;
+                        }
                     }
-                }
-                break;
-            default:
-                System.out.println("Received " + messageType+ " message in MDR");
-                break;
-        }
+                    break;
+                default:
+                    System.out.println("Received " + messageType+ " message in MDR");
+                    break;
+            }
+        }else System.out.println("MDR: received message from different version");
     }
 }

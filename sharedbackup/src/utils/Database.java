@@ -4,11 +4,10 @@ import backend.Chunk;
 import backend.ChunkData;
 import backend.ConfigManager;
 import backend.SavedFile;
+import protocols.FileDelete;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Duarte on 24-Mar-17.
@@ -21,7 +20,7 @@ public class Database implements Serializable {
     private String folder;
     private long maxBackupSize; // Bytes
 
-    private ArrayList<Chunk> savedChunks; // chunks from others
+    private List<Chunk> savedChunks; // chunks from others
     private Map<String, SavedFile> savedFiles; // files from me
 
 
@@ -31,7 +30,7 @@ public class Database implements Serializable {
         maxBackupSize = 40*1000;
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
-        savedChunks = new ArrayList<Chunk>();
+        savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
 
         //mDeletedFiles = new HashMap<String, Integer>();
     }
@@ -145,21 +144,26 @@ public class Database implements Serializable {
     public void print() {
 
         //print MAX SPACE / USED SPACE
+        System.out.println();
+        System.out.println("/////////////////////////////////////////");
         System.out.println("MY FILES:");
         for (SavedFile file: savedFiles.values()
                 ) {
             System.out.println("file = " + file.getFilePath());
-            System.out.println("FileId() = " + file.getFileId());
+            System.out.println("FileId = " + file.getFileId());
             System.out.println("REP DEG = " + file.getWantedReplicationDegree());
             file.showFileChunks();
             System.out.println();
         }
+        System.out.println();
+        System.out.println("//////////////////////////////");
         System.out.println();
         System.out.println("Chunks Stored:");
         System.out.println();
         for (Chunk chunk:savedChunks
                 ) {
             System.out.println("chunk ID = " + chunk.getFileID());
+            System.out.println("Chunk NO = " + chunk.getChunkNo());
             System.out.println("chunk size = " + chunk.getSize());
             System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDeg());
             System.out.println();
@@ -174,5 +178,35 @@ public class Database implements Serializable {
             }
         }
         return false;
+    }
+
+    public void deleteChunksFile(String fileID) {
+
+        synchronized (savedChunks){
+            Iterator<Chunk> iterator = savedChunks.iterator();
+
+            while (iterator.hasNext()){
+                Chunk chunk = iterator.next();
+                if (chunk.getFileID().equals(fileID)) {
+                    chunk.removeData();
+                    iterator.remove();
+                }
+            }
+        }
+        File folder = new File(fileID);
+        folder.delete();
+    }
+
+
+    public void removeSavedFile(String filePath) {
+        synchronized (savedFiles){
+            for (SavedFile file:savedFiles.values()
+                    ) {
+                if(file.getFilePath().equals(filePath)){
+                    FileDelete.getInstance().deleteFile(file.getFileId());
+                    savedFiles.remove(file.getFileId());
+                }
+            }
+        }
     }
 }

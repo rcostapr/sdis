@@ -2,6 +2,7 @@ package frontend;
 
 import backend.*;
 import protocols.ChunkRestore;
+import protocols.FileDelete;
 import utils.RMI_Interface;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class Interface implements RMI_Interface{
 			}
 			reg.rebind(accessPoint, stub);
 		} catch (RemoteException e) {
-			System.out.println("FODEU");
+			System.out.println("RMI problem");
 			e.printStackTrace();
 		}
 	}
@@ -99,14 +100,8 @@ public class Interface implements RMI_Interface{
 	public boolean restoreFile(String filePath){
 
 		SavedFile fileToRestore = ConfigManager.getConfigManager().getFileByPath(filePath);
-
-
 		if (fileToRestore != null	){
-
 			return FileRestore.getInstance().restoreFile(fileToRestore);
-
-
-
 		}
 		return false;
 	}
@@ -115,4 +110,12 @@ public class Interface implements RMI_Interface{
 		ConfigManager.getConfigManager().printState();
 		return true;
 	}
+
+	public boolean deleteFile(String filePath) throws RemoteException{
+		ConfigManager.getConfigManager().removeFile(filePath);
+		return true;
+
+	}
+
+
 }

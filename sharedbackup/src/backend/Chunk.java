@@ -129,9 +129,8 @@ public class Chunk implements Serializable{
 		FileOutputStream out = null;
 		try {
 			File f = new File(fileID+"/"+chunkNo);
-			if(f.getParentFile().mkdir())
-				System.out.println("FILE DIR DIDNT EXIST");
-			out = new FileOutputStream(f);
+			f.getParentFile().mkdir();
+				out = new FileOutputStream(f);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
@@ -165,4 +164,9 @@ public class Chunk implements Serializable{
 	public int getCurrentReplicationDeg() {
 		return currentReplicationDegree;
 	}
+
+    public void removeData() {
+		File chunk_file = new File(fileID+"/"+chunkNo);
+		chunk_file.delete();
+    }
 }

@@ -192,6 +192,16 @@ public class ConfigManager {
 		database.print();
 	}
 
+	public void deleteFile(String fileID) {
+		database.deleteChunksFile(fileID);
+		saveDB();
+	}
+
+	public void removeFile(String filePath) {
+		database.removeSavedFile(filePath);
+		saveDB();
+	}
+
 	public static class ConfigurationsNotInitializedException extends Exception {
 	}
 
