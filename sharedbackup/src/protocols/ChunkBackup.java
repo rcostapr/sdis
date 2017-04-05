@@ -37,16 +37,17 @@ public class ChunkBackup {
 		byte[] data = chunk.getData();
 
 		byte[] message = new byte[header.length() + data.length];
-
+		System.out.println("messageCB = " + message.length);
 
 		try {
 			System.arraycopy(header.getBytes(MulticastServer.ASCII_CODE), 0, message, 0, header.length());
+			System.out.println("message.lengthCB2 = " + message.length);
 		} catch (UnsupportedEncodingException e1) {
 
 			e1.printStackTrace();
 		}
 		System.arraycopy(data, 0, message, header.length(), data.length);
-
+		System.out.println("messagecb3 = " + message.length);
 
 		InetAddress multDBAddr = ConfigManager.getConfigManager().getMdbAddr();
 		int multDBPort = ConfigManager.getConfigManager().getmMDBport();

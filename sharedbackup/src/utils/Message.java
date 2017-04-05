@@ -14,6 +14,7 @@ public class Message {
 	private String header;
 	private byte[] body;
 	public Message(byte[] msg) {
+		//System.out.println("msg = " + msg.length);
 		byte[] headerEnd = null;
 
 
@@ -28,7 +29,8 @@ public class Message {
 		header = new String(Arrays.copyOfRange(msg, 0, headerEndIndex));
 
 		try {
-			body = Arrays.copyOfRange(msg, headerEndIndex + MulticastServer.CRLF.length() * 2, msg.length);
+			body = Arrays.copyOfRange(msg, headerEndIndex + 4, msg.length);
+		//	System.out.println("body = " + body.length);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			// there is no body
 			body = null;

@@ -13,7 +13,7 @@ public class MulticastServer {
 	private static int TTL = 2;
 
     public static final String ASCII_CODE = "US-ASCII";
-	private static int MAX_PACKET_SIZE  = 64000;
+	private static int MAX_PACKET_SIZE  = 65000;
 
 	public static final String CRLF = "\r\n";
 

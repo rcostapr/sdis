@@ -61,7 +61,7 @@ public class MDBHandler implements Runnable {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
+                        System.out.println("message = " + message.getBody().length);
                         //if the chunk didnt get enough stored, then im storing it
                         if (actualChunk.getCurrentReplicationDeg() < actualChunk
                                 .getWantedReplicationDegree()) {

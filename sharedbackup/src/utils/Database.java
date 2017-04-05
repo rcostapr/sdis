@@ -200,11 +200,13 @@ public class Database implements Serializable {
 
     public void removeSavedFile(String filePath) {
         synchronized (savedFiles){
-            for (SavedFile file:savedFiles.values()
-                    ) {
-                if(file.getFilePath().equals(filePath)){
+            Iterator<SavedFile> it = savedFiles.values().iterator();
+
+            while (it.hasNext()){
+                SavedFile file = it.next();
+                if (file.getFilePath().equals(filePath)){
                     FileDelete.getInstance().deleteFile(file.getFileId());
-                    savedFiles.remove(file.getFileId());
+                    it.remove();
                 }
             }
         }
