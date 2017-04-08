@@ -17,6 +17,11 @@ public class Chunk implements Serializable{
 
 
 	private int wantedReplicationDegree;
+
+	public boolean isMyFile() {
+		return isMyFile;
+	}
+
 	private boolean isMyFile;
 
 	public Chunk(SavedFile tFile, long tChunkno) {
@@ -115,7 +120,7 @@ public class Chunk implements Serializable{
 				in = new FileInputStream(newchunkfile);
 				byte[] buffer = new byte[(int) newchunkfile.length()];
 				int i = in.read(buffer);
-				//Log.log("Chunk has " + i + " size");
+
 				in.close();
 				return buffer;
 			} catch (FileNotFoundException e) {
@@ -160,10 +165,6 @@ public class Chunk implements Serializable{
 	}
 
 	public void setSize(int size){this.size=size;}
-
-	public int getCurrentReplicationDeg() {
-		return currentReplicationDegree;
-	}
 
     public void removeData() {
 		File chunk_file = new File(fileID+"/"+chunkNo);

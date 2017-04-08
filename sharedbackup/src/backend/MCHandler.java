@@ -1,5 +1,6 @@
 package backend;
 
+import protocols.ChunkBackup;
 import protocols.ChunkRestore;
 import utils.Message;
 
@@ -11,16 +12,17 @@ import java.util.Random;
 public class MCHandler implements Runnable {
     private Message mMessage;
     private Random random;
-    private static final int TIMEOUT= 400;
+    private static final int TIMEOUT = 400;
     private String IP;
+
     public MCHandler(Message receivedMessage, String IP) {
-        mMessage=receivedMessage;
+        mMessage = receivedMessage;
         random = new Random();
-        this.IP=IP;
+        this.IP = IP;
     }
 
-    public void run(){
-        String[] headerParts  = mMessage.getHeader().split(" ");
+    public void run() {
+        String[] headerParts = mMessage.getHeader().split(" ");
 
         String messageType = headerParts[0].trim();
         int messageID = Integer.parseInt(headerParts[2].trim());
@@ -31,33 +33,29 @@ public class MCHandler implements Runnable {
         final String fileID;
         final int chunkNR;
 
-        if (headerParts[1].trim().equals("1.0")){
+        if (headerParts[1].trim().equals("1.0")) {
             switch (messageType) {
                 case "STORED":
 
                     fileID = headerParts[3].trim();
                     chunkNR = Integer.parseInt(headerParts[4].trim());
                     //if the file is mine, ++ repCount of the chunk
-
+                    System.out.println("Received STORED from " + messageID + " for chunk "+ chunkNR);
                     if (messageID != ConfigManager.getConfigManager().getMyID()) {
                         try {
+                            System.out.println("try");
                             ConfigManager.getConfigManager().incChunkReplication(fileID,
                                     chunkNR);
                         } catch (ConfigManager.InvalidChunkException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                    // if not my file, ++ the count of the chunks im pending
-
-                    else {
-                        synchronized (MCListener.getInstance().pendingChunks) {
-                            for (Chunk chunk : MCListener
-                                    .getInstance().pendingChunks) {
-                                if (fileID.equals(chunk.getFileID())
-                                        && chunk.getChunkNo() == chunkNR) {
-
-                                    chunk.incCurrentReplication();
+                            System.out.println("catch");
+                            synchronized (MCListener.getInstance().pendingChunks) {
+                                for (Chunk chunk : MCListener
+                                        .getInstance().pendingChunks) {
+                                    if (fileID.equals(chunk.getFileID())
+                                            && chunk.getChunkNo() == chunkNR) {
+                                        System.out.println("Chunk " + chunk.getChunkNo() + " increasing from "+ chunk.getCurrentReplicationDegree());
+                                        chunk.incCurrentReplication();
+                                    }
                                 }
                             }
                         }
@@ -99,13 +97,30 @@ public class MCHandler implements Runnable {
                     }
                     break;
                 case "REMOVED":
-                    //removed
+                    if (messageID != ConfigManager.getConfigManager().getMyID()) {
+                        fileID = headerParts[3].trim();
+                        chunkNR = Integer.parseInt(headerParts[4].trim());
+
+                        Chunk removedChunk = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNR);
+                        ConfigManager.getConfigManager().decChunkReplication(fileID, chunkNR);
+                        if (removedChunk != null) {
+                            try {
+                                Thread.sleep(400);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (removedChunk.getCurrentReplicationDegree() < removedChunk.getWantedReplicationDegree()) {
+                                ChunkBackup.getInstance().putChunk(removedChunk);
+                            }
+                        }
+                    }
                     break;
                 default:
                     //unknown
                     System.out.println("Can't handle " + messageType + "type");
                     break;
             }
-        }else System.out.println("MC: message with different version");
+        } else System.out.println("MC: message with different version");
     }
 }

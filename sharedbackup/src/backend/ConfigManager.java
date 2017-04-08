@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +31,7 @@ public class ConfigManager {
 
     private boolean isDatabaseLoaded = false;
     private Database database = null;
-
+    private Random random;
     private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
     private int mMCport = 0, mMDBport = 0, mMDRport = 0;
 
@@ -41,6 +44,7 @@ public class ConfigManager {
         mdbListener = null;
         mExecutorService = Executors.newFixedThreadPool(60);
         isDatabaseLoaded = loadDatabase();
+        random = new Random();
 
     }
 
@@ -169,6 +173,16 @@ public class ConfigManager {
         database.saveDatabase();
     }
 
+    public void decChunkReplication(String fileId, int chunkNo) {
+        database.decChunkReplication(fileId, chunkNo);
+        database.saveDatabase();
+    }
+
+    public void removeChunk(Chunk chunk) {
+        database.removeChunk(chunk);
+        saveDB();
+    }
+
     public void saveDB() {
         database.saveDatabase();
     }
@@ -212,8 +226,27 @@ public class ConfigManager {
 
     public void setMaxSpace(long maxSpace) {
 
-            database.setAvailSpace(maxSpace);
-            saveDB();
+        database.setAvailSpace(maxSpace);
+        saveDB();
+    }
+
+    public Chunk getNextRemovableChunk() {
+        List<Chunk> savedChunks = database.getSavedChunks();
+
+        for (Chunk chunk : savedChunks
+                ) {
+            if (chunk.getCurrentReplicationDegree() > chunk.getWantedReplicationDegree()) {
+                return chunk;
+            }
+        }
+
+        Chunk randomChunk = null;
+
+        do {
+            randomChunk = savedChunks.get(random.nextInt(savedChunks.size()));
+        } while (randomChunk.getCurrentReplicationDegree() <= 0);
+
+        return randomChunk;
     }
 
     public static class ConfigurationsNotInitializedException extends Exception {

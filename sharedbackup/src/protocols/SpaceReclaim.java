@@ -25,7 +25,7 @@ public class SpaceReclaim {
     private SpaceReclaim() {
     }
 
-    public reclaim(Chunk chunk) {
+    public void reclaim(Chunk chunk) {
 
         String message = "";
 

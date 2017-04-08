@@ -20,6 +20,7 @@ public class Database implements Serializable {
     private String folder;
     private long maxBackupSize; // Bytes
 
+
     private List<Chunk> savedChunks; // chunks from others
     private Map<String, SavedFile> savedFiles; // files from me
 
@@ -27,7 +28,7 @@ public class Database implements Serializable {
     //private Map<String, Integer> mDeletedFiles;
 
     public Database() {
-        maxBackupSize = 40 * 1000;
+        maxBackupSize = 40000 * 1000;// 40MB default space
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
@@ -35,6 +36,9 @@ public class Database implements Serializable {
         //mDeletedFiles = new HashMap<String, Integer>();
     }
 
+    public List<Chunk> getSavedChunks() {
+        return savedChunks;
+    }
 
     public long getMaxBackupSize() {
         return maxBackupSize;
@@ -89,27 +93,25 @@ public class Database implements Serializable {
     public synchronized void incChunkReplication(String fileId, int chunkNo)
             throws ConfigManager.InvalidChunkException {
         SavedFile file = savedFiles.get(fileId);
-        System.out.println("size = " + savedFiles.size());
+        Chunk chunk = null;
         if (file != null) {
             // This is the owner machine of chunk's parent file
             file.incChunkReplication(chunkNo);
         } else {
             // It is a chunk saved in a backup operation
-            Chunk chunk = null;
-            int nrSavedChunks = savedChunks.size();
-            for (int i = 0; i < nrSavedChunks; i++) {
-                chunk = savedChunks.get(i);
-                if (chunk.getFileID().equals(fileId)
-                        && chunk.getChunkNo() == chunkNo) {
+            for (Chunk list :
+                    savedChunks) {
+                if (list.getFileID().equals(fileId)
+                        && list.getChunkNo() == chunkNo) {
+                    chunk = list;
                     break;
                 }
             }
-            if (chunk != null) {
-                chunk.incCurrentReplication();
-
-            } else {
-                throw new ConfigManager.InvalidChunkException();
-            }
+        }
+        if (chunk != null) {
+            chunk.incCurrentReplication();
+        } else {
+            throw new ConfigManager.InvalidChunkException();
         }
     }
 
@@ -146,7 +148,7 @@ public class Database implements Serializable {
         //print MAX SPACE / USED SPACE
         System.out.println();
         System.out.println("/////////////////////////////////////////");
-        System.out.println("Used Space: " + getUsedSpace() / 1000 + " / " + maxBackupSize + " KB");
+        System.out.println("Used Space: " + getUsedSpace() / 1000 + " / " + maxBackupSize / 1000 + " KB");
         System.out.println("MY FILES:");
         for (SavedFile file : savedFiles.values()
                 ) {
@@ -166,7 +168,7 @@ public class Database implements Serializable {
             System.out.println("chunk ID = " + chunk.getFileID());
             System.out.println("Chunk NO = " + chunk.getChunkNo());
             System.out.println("chunk size = " + chunk.getSize());
-            System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDeg());
+            System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDegree());
             System.out.println();
         }
     }
@@ -221,5 +223,32 @@ public class Database implements Serializable {
             usedSpace += chunk.getSize();
         }
         return usedSpace;
+    }
+
+    public void decChunkReplication(String fileId, int chunkNo) {
+
+        for (Chunk chunk : savedChunks
+                ) {
+            if (chunk.getFileID().equals(fileId) && chunk.getChunkNo() == chunkNo) {
+                chunk.setCurrentReplicationDegree(chunk.getCurrentReplicationDegree() - 1);
+            }
+        }
+    }
+
+    public void removeChunk(Chunk deleteChunk) {
+        synchronized (savedChunks) {
+            Iterator<Chunk> iterator = savedChunks.iterator();
+
+            while (iterator.hasNext()) {
+                Chunk chunk = iterator.next();
+                if (chunk.getFileID().equals(deleteChunk.getFileID()) && chunk.getChunkNo() == deleteChunk.getChunkNo()) {
+                    chunk.removeData();
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+        File folder = new File(deleteChunk.getFileID());
+        folder.delete();
     }
 }

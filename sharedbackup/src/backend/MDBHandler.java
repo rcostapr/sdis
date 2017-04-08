@@ -35,7 +35,7 @@ public class MDBHandler implements Runnable {
                 case "PUTCHUNK":
                     //putchunk
 
-                    //TODO: if chunk size exceeds my available space
+
                     if (message.getBody().length + ConfigManager.getConfigManager().getUsedSpace() <= ConfigManager.getConfigManager().getMaxSpace()) {
                         final int senderID = Integer.parseInt(header_parts[2].trim());
 
@@ -51,7 +51,7 @@ public class MDBHandler implements Runnable {
                         Chunk chunkOBJ = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNo);
 
                         if (chunkOBJ == null) {
-                            Chunk actualChunk = new Chunk(fileID, chunkNo, wantedReplication, 0);
+                            Chunk actualChunk = new Chunk(fileID, chunkNo, wantedReplication,0);
 
                             synchronized (MCListener.getInstance().pendingChunks) {
                                 MCListener.getInstance().pendingChunks
@@ -62,21 +62,23 @@ public class MDBHandler implements Runnable {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            System.out.println("message = " + message.getBody().length);
                             //if the chunk didnt get enough stored, then im storing it
-                            if (actualChunk.getCurrentReplicationDeg() < actualChunk
-                                    .getWantedReplicationDegree()) {
-                                actualChunk.setSize(message.getBody().length);
-                                ChunkBackup.getInstance().storeChunk(actualChunk,
-                                        message.getBody());
-                            }
+
 
                             synchronized (MCListener.getInstance().pendingChunks) {
+                                if (actualChunk.getCurrentReplicationDegree() < actualChunk
+                                        .getWantedReplicationDegree()) {
+                                    System.out.println("saving "+actualChunk.getChunkNo()+" chunk with current " + actualChunk.getCurrentReplicationDegree());
+                                    actualChunk.setSize(message.getBody().length);
+                                    ChunkBackup.getInstance().storeChunk(actualChunk,
+                                            message.getBody());
+                                }
                                 MCListener.getInstance().pendingChunks
                                         .remove(actualChunk);
                             }
                         }
                     } else {
+                        System.out.println(( "body " +message.getBody().length +" used "+ ConfigManager.getConfigManager().getUsedSpace() + " max "+ConfigManager.getConfigManager().getMaxSpace()));
                         System.out.println("Chunk would exceed my space");
                     }
 

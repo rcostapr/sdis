@@ -3,6 +3,7 @@ package frontend;
 import backend.*;
 import protocols.ChunkRestore;
 import protocols.FileDelete;
+import protocols.SpaceReclaim;
 import utils.RMI_Interface;
 
 import java.io.File;
@@ -123,8 +124,9 @@ public class Interface implements RMI_Interface{
 
 		while (ConfigManager.getConfigManager().getMaxSpace() <= ConfigManager.getConfigManager().getUsedSpace()) {
 			//get next reclaim//
-
-
+			Chunk deletedChunk = ConfigManager.getConfigManager().getNextRemovableChunk();
+			SpaceReclaim.getInstance().reclaim(deletedChunk);
+			ConfigManager.getConfigManager().removeChunk(deletedChunk);
 		}
 		return true;
 	}
