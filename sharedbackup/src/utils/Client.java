@@ -15,6 +15,7 @@ public class Client {
 
     //TODO: Validate inputs, launch protocols
     static RMI_Interface stub;
+
     public static void main(String[] args) {
         //TODO: USAGE and args validation
         //Client Acess_Point Command operand1 operand2
@@ -27,58 +28,76 @@ public class Client {
         }
 
         String command = args[1];
-        switch (command){
+        System.out.println("args = " + args.length);
+        boolean response = false;
+        switch (command) {
             case "HELLO":
                 try {
-                    String response = stub.sayHello();
-                    System.out.println("response = " + response);
+                    String resp = stub.sayHello();
+                    System.out.println("response = " + resp);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
                 break;
             case "BACKUP":
-                boolean response = false;
-                try {
-                    response = stub.backupFile("test.pdf", 1);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("response: " + response);
+                if (args.length == 4) {
+                    try {
+                        response = stub.backupFile(args[2], Integer.parseInt(args[3]));
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("response: " + response);
+                } else System.out.println("invalid arguments");
                 break;
 
             case "RESTORE":
-                response = false;
-                try {
-                    response = stub.restoreFile("test.pdf");
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("response: " + response);
+                if (args.length == 3) {
+
+                    response = false;
+                    try {
+                        response = stub.restoreFile(args[2]);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("response: " + response);
+                } else System.out.println("invalid arguments");
                 break;
 
             case "DELETE":
-                response = false;
-                try {
-                    response = stub.deleteFile("test.pdf");
-                } catch (RemoteException e){
-                    e.printStackTrace();
-                }
-                System.out.println("response: "+ response);
+                if (args.length == 3) {
+                    response = false;
+                    try {
+                        response = stub.deleteFile(args[2]);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("response: " + response);
+                } else System.out.println("invalid arguments");
                 break;
 
             case "STATE":
-                try {
-                    stub.state();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                if (args.length == 2) {
+                    try {
+                        stub.state();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                } else System.out.println("invalid arguments");
                 break;
             case "RECLAIM":
-                //
+
+                if (args.length == 3) {
+                    try {
+                        response= stub.spaceReclaim(Integer.parseInt(args[2]));
+                    }
+                    catch (RemoteException e){
+                        e.printStackTrace();
+                    }
+                } else System.out.println("invalid arguments");
                 break;
 
             default:
-                System.out.println("Command = " + command+ " not recognized");
+                System.out.println("Command = " + command + " not recognized");
         }
     }
 }

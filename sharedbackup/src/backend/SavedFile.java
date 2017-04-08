@@ -25,7 +25,7 @@ public class SavedFile implements Serializable {
 	private int wantedReplicationDegree;
 
 	public SavedFile(String filePath, int desiredReplicationDegree){
-		this.filePath = filePath;
+		this.filePath = new File(filePath).getAbsolutePath();
 		wantedReplicationDegree = desiredReplicationDegree;
 
 		fileId = generateID(new File(filePath));
@@ -63,6 +63,7 @@ public class SavedFile implements Serializable {
 		}
 
 		String file_id = file.getName();
+		System.out.println("file.getName() = " + file.getName());
 		file_id += file.lastModified();
 
 		file_id += file.length();

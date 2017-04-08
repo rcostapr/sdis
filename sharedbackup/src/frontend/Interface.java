@@ -117,5 +117,15 @@ public class Interface implements RMI_Interface{
 
 	}
 
+	public boolean spaceReclaim(int newSpace){
 
+		ConfigManager.getConfigManager().setMaxSpace(newSpace*1000);
+
+		while (ConfigManager.getConfigManager().getMaxSpace() <= ConfigManager.getConfigManager().getUsedSpace()) {
+			//get next reclaim//
+
+
+		}
+		return true;
+	}
 }

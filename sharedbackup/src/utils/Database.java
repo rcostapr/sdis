@@ -27,7 +27,7 @@ public class Database implements Serializable {
     //private Map<String, Integer> mDeletedFiles;
 
     public Database() {
-        maxBackupSize = 40*1000;
+        maxBackupSize = 40 * 1000;
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
@@ -40,12 +40,11 @@ public class Database implements Serializable {
         return maxBackupSize;
     }
 
-    public synchronized void setAvailSpace(long space)
-            throws ConfigManager.InvalidBackupSizeException {
-        if (space <= 0) {
-            throw new ConfigManager.InvalidBackupSizeException();
+    public synchronized void setAvailSpace(long space) {
+        if (space > 0) {
+            maxBackupSize = space;
         }
-        maxBackupSize = space;
+
     }
 
     public void saveDatabase() {
@@ -86,6 +85,7 @@ public class Database implements Serializable {
 
         return rChunk;
     }
+
     public synchronized void incChunkReplication(String fileId, int chunkNo)
             throws ConfigManager.InvalidChunkException {
         SavedFile file = savedFiles.get(fileId);
@@ -116,23 +116,23 @@ public class Database implements Serializable {
     public SavedFile getNewSavedFile(String path, int replication) throws
             SavedFile.FileTooLargeException,
             SavedFile.FileDoesNotExistsException,
-            ConfigManager.FileAlreadySaved{
-        SavedFile file = new SavedFile(path,replication);
-        if (savedFiles.containsKey(file.getFileId())){
+            ConfigManager.FileAlreadySaved {
+        SavedFile file = new SavedFile(path, replication);
+        if (savedFiles.containsKey(file.getFileId())) {
             throw new ConfigManager.FileAlreadySaved();
         }
-        savedFiles.put(file.getFileId(),file);
+        savedFiles.put(file.getFileId(), file);
 
         return file;
     }
 
     public void addChunk(Chunk chunk) {
-        synchronized (savedChunks){
+        synchronized (savedChunks) {
             savedChunks.add(chunk);
         }
     }
 
-    public SavedFile getFileByPath(String path){
+    public SavedFile getFileByPath(String path) {
         for (SavedFile file : savedFiles.values()) {
             if (file.getFilePath().equals(path)) {
                 return file;
@@ -146,8 +146,9 @@ public class Database implements Serializable {
         //print MAX SPACE / USED SPACE
         System.out.println();
         System.out.println("/////////////////////////////////////////");
+        System.out.println("Used Space: " + getUsedSpace() / 1000 + " / " + maxBackupSize + " KB");
         System.out.println("MY FILES:");
-        for (SavedFile file: savedFiles.values()
+        for (SavedFile file : savedFiles.values()
                 ) {
             System.out.println("file = " + file.getFilePath());
             System.out.println("FileId = " + file.getFileId());
@@ -160,7 +161,7 @@ public class Database implements Serializable {
         System.out.println();
         System.out.println("Chunks Stored:");
         System.out.println();
-        for (Chunk chunk:savedChunks
+        for (Chunk chunk : savedChunks
                 ) {
             System.out.println("chunk ID = " + chunk.getFileID());
             System.out.println("Chunk NO = " + chunk.getChunkNo());
@@ -170,10 +171,10 @@ public class Database implements Serializable {
         }
     }
 
-    public boolean isChunkBackedUP(String fileID, int chunkNR){
-        for (Chunk chunk:savedChunks
+    public boolean isChunkBackedUP(String fileID, int chunkNR) {
+        for (Chunk chunk : savedChunks
                 ) {
-            if (chunk.getFileID().equals(fileID) && chunk.getChunkNo() == chunkNR){
+            if (chunk.getFileID().equals(fileID) && chunk.getChunkNo() == chunkNR) {
                 return true;
             }
         }
@@ -182,10 +183,10 @@ public class Database implements Serializable {
 
     public void deleteChunksFile(String fileID) {
 
-        synchronized (savedChunks){
+        synchronized (savedChunks) {
             Iterator<Chunk> iterator = savedChunks.iterator();
 
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Chunk chunk = iterator.next();
                 if (chunk.getFileID().equals(fileID)) {
                     chunk.removeData();
@@ -199,16 +200,26 @@ public class Database implements Serializable {
 
 
     public void removeSavedFile(String filePath) {
-        synchronized (savedFiles){
+        File f = new File(filePath);
+        synchronized (savedFiles) {
             Iterator<SavedFile> it = savedFiles.values().iterator();
 
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 SavedFile file = it.next();
-                if (file.getFilePath().equals(filePath)){
+                if (file.getFilePath().equals(f.getAbsolutePath())) {
                     FileDelete.getInstance().deleteFile(file.getFileId());
                     it.remove();
                 }
             }
         }
+    }
+
+    public long getUsedSpace() {
+        long usedSpace = 0;
+        for (Chunk chunk : savedChunks
+                ) {
+            usedSpace += chunk.getSize();
+        }
+        return usedSpace;
     }
 }

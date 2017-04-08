@@ -32,6 +32,7 @@ public class MDBListener implements Runnable{
         MulticastServer receiver = new MulticastServer(addr , port);
         receiver.join();
 
+
         try {
             //TODO: get a way to stop this
             while (true){

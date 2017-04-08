@@ -36,44 +36,48 @@ public class MDBHandler implements Runnable {
                     //putchunk
 
                     //TODO: if chunk size exceeds my available space
-                    final int senderID = Integer.parseInt(header_parts[2].trim());
+                    if (message.getBody().length + ConfigManager.getConfigManager().getUsedSpace() <= ConfigManager.getConfigManager().getMaxSpace()) {
+                        final int senderID = Integer.parseInt(header_parts[2].trim());
 
-                    if (senderID == ConfigManager.getConfigManager().getMyID()){
-                        return;
-                    }
-
-                    final String fileID = header_parts[3].trim();
-                    final int chunkNo = Integer.parseInt(header_parts[4].trim());
-                    int wantedReplication = Integer.parseInt(header_parts[5]
-                            .trim());
-
-                    Chunk chunkOBJ = ConfigManager.getConfigManager().getSavedChunk(fileID,chunkNo);
-
-                    if (chunkOBJ == null){
-                        Chunk actualChunk = new Chunk(fileID,chunkNo,wantedReplication,0);
-
-                        synchronized (MCListener.getInstance().pendingChunks) {
-                            MCListener.getInstance().pendingChunks
-                                    .add(actualChunk);
-                        }
-                        try {
-                            Thread.sleep(random.nextInt(MAX_WAIT_TIME));
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        System.out.println("message = " + message.getBody().length);
-                        //if the chunk didnt get enough stored, then im storing it
-                        if (actualChunk.getCurrentReplicationDeg() < actualChunk
-                                .getWantedReplicationDegree()) {
-                            actualChunk.setSize(message.getBody().length);
-                            ChunkBackup.getInstance().storeChunk(actualChunk,
-                                    message.getBody());
+                        if (senderID == ConfigManager.getConfigManager().getMyID()) {
+                            return;
                         }
 
-                        synchronized (MCListener.getInstance().pendingChunks) {
-                            MCListener.getInstance().pendingChunks
-                                    .remove(actualChunk);
+                        final String fileID = header_parts[3].trim();
+                        final int chunkNo = Integer.parseInt(header_parts[4].trim());
+                        int wantedReplication = Integer.parseInt(header_parts[5]
+                                .trim());
+
+                        Chunk chunkOBJ = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNo);
+
+                        if (chunkOBJ == null) {
+                            Chunk actualChunk = new Chunk(fileID, chunkNo, wantedReplication, 0);
+
+                            synchronized (MCListener.getInstance().pendingChunks) {
+                                MCListener.getInstance().pendingChunks
+                                        .add(actualChunk);
+                            }
+                            try {
+                                Thread.sleep(random.nextInt(MAX_WAIT_TIME));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            System.out.println("message = " + message.getBody().length);
+                            //if the chunk didnt get enough stored, then im storing it
+                            if (actualChunk.getCurrentReplicationDeg() < actualChunk
+                                    .getWantedReplicationDegree()) {
+                                actualChunk.setSize(message.getBody().length);
+                                ChunkBackup.getInstance().storeChunk(actualChunk,
+                                        message.getBody());
+                            }
+
+                            synchronized (MCListener.getInstance().pendingChunks) {
+                                MCListener.getInstance().pendingChunks
+                                        .remove(actualChunk);
+                            }
                         }
+                    } else {
+                        System.out.println("Chunk would exceed my space");
                     }
 
                     break;

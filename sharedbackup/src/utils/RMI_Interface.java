@@ -16,4 +16,5 @@ public interface RMI_Interface extends Remote{
     boolean restoreFile(String filePath)throws RemoteException;
     boolean state() throws RemoteException;
     boolean deleteFile(String filePath) throws RemoteException;
+    boolean spaceReclaim(int newSpace) throws RemoteException;
 }
