@@ -225,12 +225,19 @@ public class Database implements Serializable {
         return usedSpace;
     }
 
-    public void decChunkReplication(String fileId, int chunkNo) {
+    public  synchronized void decChunkReplication(String fileId, int chunkNo) {
+
+for (SavedFile file:savedFiles.values()){
+    if (file.getFileId().equals(fileId)){
+        file.getChunkList().get(chunkNo).decCurrentReplicationDegree();
+    }
+}
 
         for (Chunk chunk : savedChunks
                 ) {
             if (chunk.getFileID().equals(fileId) && chunk.getChunkNo() == chunkNo) {
                 chunk.setCurrentReplicationDegree(chunk.getCurrentReplicationDegree() - 1);
+                return;
             }
         }
     }

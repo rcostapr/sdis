@@ -52,7 +52,7 @@ public class Chunk implements Serializable{
 		this.chunkNo = chunkNo;
 	}
 
-	public int getCurrentReplicationDegree() {
+	public synchronized int getCurrentReplicationDegree() {
 		return currentReplicationDegree;
 	}
 
@@ -160,8 +160,8 @@ public class Chunk implements Serializable{
 		}
 		return true;
 	}
-	public synchronized int incCurrentReplication() {
-		return ++currentReplicationDegree;
+	public synchronized void incCurrentReplication() {
+		++currentReplicationDegree;
 	}
 
 	public void setSize(int size){this.size=size;}
@@ -170,4 +170,8 @@ public class Chunk implements Serializable{
 		File chunk_file = new File(fileID+"/"+chunkNo);
 		chunk_file.delete();
     }
+
+	public synchronized void decCurrentReplicationDegree() {
+		 --currentReplicationDegree;
+	}
 }

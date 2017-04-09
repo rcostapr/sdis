@@ -167,13 +167,13 @@ public class ConfigManager {
         return database.getSavedChunk(fileId, chunkNo);
     }
 
-    public void incChunkReplication(String fileId, int chunkNo)
+    public synchronized void incChunkReplication(String fileId, int chunkNo)
             throws InvalidChunkException {
         database.incChunkReplication(fileId, chunkNo);
         database.saveDatabase();
     }
 
-    public void decChunkReplication(String fileId, int chunkNo) {
+    public synchronized void decChunkReplication(String fileId, int chunkNo) {
         database.decChunkReplication(fileId, chunkNo);
         database.saveDatabase();
     }

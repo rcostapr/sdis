@@ -40,8 +40,9 @@ public class MCHandler implements Runnable {
                     fileID = headerParts[3].trim();
                     chunkNR = Integer.parseInt(headerParts[4].trim());
                     //if the file is mine, ++ repCount of the chunk
-                    System.out.println("Received STORED from " + messageID + " for chunk "+ chunkNR);
-                    if (messageID != ConfigManager.getConfigManager().getMyID()) {
+                    System.out.println("Received STORED from " + messageID + " for chunk " + chunkNR);
+
+
                         try {
                             System.out.println("try");
                             ConfigManager.getConfigManager().incChunkReplication(fileID,
@@ -49,14 +50,15 @@ public class MCHandler implements Runnable {
                         } catch (ConfigManager.InvalidChunkException e) {
                             System.out.println("catch");
                             synchronized (MCListener.getInstance().pendingChunks) {
-                                for (Chunk chunk : MCListener
-                                        .getInstance().pendingChunks) {
-                                    if (fileID.equals(chunk.getFileID())
-                                            && chunk.getChunkNo() == chunkNR) {
-                                        System.out.println("Chunk " + chunk.getChunkNo() + " increasing from "+ chunk.getCurrentReplicationDegree());
-                                        chunk.incCurrentReplication();
-                                    }
+                            for (Chunk chunk : MCListener
+                                    .getInstance().pendingChunks) {
+                                if (fileID.equals(chunk.getFileID())
+                                        && chunk.getChunkNo() == chunkNR) {
+                                    System.out.println("Chunk " + chunk.getChunkNo() + " increasing from " + chunk.getCurrentReplicationDegree());
+                                    chunk.incCurrentReplication();
+                                    break;
                                 }
+
                             }
                         }
                     }
@@ -81,10 +83,11 @@ public class MCHandler implements Runnable {
                             }
                             //If no one responded to the GET, then I will do it
                             if (!record.isServed) {
-
                                 ChunkRestore.getInstance().sendChunk(chunkToGet);
                             }
-                            MCListener.getInstance().watchedChunk.remove(record);
+                            synchronized (MCListener.getInstance().watchedChunk) {
+                                MCListener.getInstance().watchedChunk.remove(record);
+                            }
                         }
                     }
                     break;
@@ -102,10 +105,10 @@ public class MCHandler implements Runnable {
                         chunkNR = Integer.parseInt(headerParts[4].trim());
 
                         Chunk removedChunk = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNR);
-                        ConfigManager.getConfigManager().decChunkReplication(fileID, chunkNR);
                         if (removedChunk != null) {
                             try {
-                                Thread.sleep(400);
+                                removedChunk.decCurrentReplicationDegree();
+                                Thread.sleep(random.nextInt(401));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

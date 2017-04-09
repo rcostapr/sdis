@@ -113,7 +113,8 @@ public class Interface implements RMI_Interface{
 	}
 
 	public boolean deleteFile(String filePath) throws RemoteException{
-		ConfigManager.getConfigManager().removeFile(filePath);
+
+		ConfigManager.getConfigManager().removeFile(new File (filePath).getAbsolutePath());
 		return true;
 
 	}

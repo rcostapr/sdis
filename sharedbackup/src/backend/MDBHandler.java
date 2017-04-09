@@ -17,6 +17,7 @@ public class MDBHandler implements Runnable {
     private static final int MAX_WAIT_TIME = 401;
 
     private static MDBHandler mInstance = null;
+
     public MDBHandler(Message receivedMessage) {
         message = receivedMessage;
         random = new Random();
@@ -29,9 +30,9 @@ public class MDBHandler implements Runnable {
         String[] header_parts = message.getHeader().split(" ");
         String messageType = header_parts[0].trim();
 
-        if (header_parts[1].trim().equals("1.0")){
+        if (header_parts[1].trim().equals("1.0")) {
             System.out.println("MDB received a " + messageType);
-            switch (messageType){
+            switch (messageType) {
                 case "PUTCHUNK":
                     //putchunk
 
@@ -51,11 +52,12 @@ public class MDBHandler implements Runnable {
                         Chunk chunkOBJ = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNo);
 
                         if (chunkOBJ == null) {
-                            Chunk actualChunk = new Chunk(fileID, chunkNo, wantedReplication,0);
+                            Chunk actualChunk = new Chunk(fileID, chunkNo, wantedReplication, 0);
 
                             synchronized (MCListener.getInstance().pendingChunks) {
                                 MCListener.getInstance().pendingChunks
                                         .add(actualChunk);
+
                             }
                             try {
                                 Thread.sleep(random.nextInt(MAX_WAIT_TIME));
@@ -65,28 +67,28 @@ public class MDBHandler implements Runnable {
                             //if the chunk didnt get enough stored, then im storing it
 
 
+                            if (actualChunk.getCurrentReplicationDegree() < actualChunk
+                                    .getWantedReplicationDegree()) {
+                                System.out.println("saving " + actualChunk.getChunkNo() + " chunk with current " + actualChunk.getCurrentReplicationDegree());
+                                actualChunk.setSize(message.getBody().length);
+                                ChunkBackup.getInstance().storeChunk(actualChunk,
+                                        message.getBody());
+                            }
                             synchronized (MCListener.getInstance().pendingChunks) {
-                                if (actualChunk.getCurrentReplicationDegree() < actualChunk
-                                        .getWantedReplicationDegree()) {
-                                    System.out.println("saving "+actualChunk.getChunkNo()+" chunk with current " + actualChunk.getCurrentReplicationDegree());
-                                    actualChunk.setSize(message.getBody().length);
-                                    ChunkBackup.getInstance().storeChunk(actualChunk,
-                                            message.getBody());
-                                }
                                 MCListener.getInstance().pendingChunks
                                         .remove(actualChunk);
                             }
                         }
                     } else {
-                        System.out.println(( "body " +message.getBody().length +" used "+ ConfigManager.getConfigManager().getUsedSpace() + " max "+ConfigManager.getConfigManager().getMaxSpace()));
+                        System.out.println(("body " + message.getBody().length + " used " + ConfigManager.getConfigManager().getUsedSpace() + " max " + ConfigManager.getConfigManager().getMaxSpace()));
                         System.out.println("Chunk would exceed my space");
                     }
 
                     break;
                 default:
-                    System.out.println("Received " + messageType+ " message in MDB");
+                    System.out.println("Received " + messageType + " message in MDB");
                     break;
             }
-        }else System.out.println("MDB: message with different version");
+        } else System.out.println("MDB: message with different version");
     }
 }

@@ -123,16 +123,13 @@ public class SavedFile implements Serializable {
 		return chunkList;
 	}
 
-	public void setChunkList(ArrayList<Chunk> chunkList) {
-		this.chunkList = chunkList;
-	}
 
 	public boolean exists() {
 		return new File(filePath).exists();
 	}
 
 
-	public void incChunkReplication(int chunkNo) throws ConfigManager.InvalidChunkException {
+	public synchronized void incChunkReplication(int chunkNo) throws ConfigManager.InvalidChunkException {
 		Chunk chunk = null;
 
 		try {

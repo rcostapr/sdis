@@ -10,4 +10,8 @@ public class ChunkRecord {
 		this.chunkNo = chunkNo;
 		this.isServed = false;
 	}
+
+    public void setServed(boolean b) {
+		isServed=b;
+    }
 }

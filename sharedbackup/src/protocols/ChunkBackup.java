@@ -96,7 +96,7 @@ public class ChunkBackup {
 		// save chunk in file
 		chunk.saveToFile(data);
 
-		chunk.incCurrentReplication();
+		//chunk.incCurrentReplication();
 
 		// add chunk to database
 		ConfigManager.getConfigManager().addSavedChunk(chunk);
