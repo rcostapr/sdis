@@ -64,15 +64,22 @@ public class ConfigManager {
                 database = (Database) in.readObject();
             } catch (ClassNotFoundException e) {
 
-                //System.out.println("Starting new DB");
+                System.out.println("Starting new DB");
+                in.close();
+                fileIn.close();
                 database = new Database();
+                return false;
             }
+            System.out.println("== DB already exists ==");
+            System.out.println("===== Saved Files =====");
+            database.printSavedFiles();
+            System.out.println("=======================");
             in.close();
             fileIn.close();
 
         } catch (FileNotFoundException e) {
 
-            //System.out.println("Starting new DB");
+            System.out.println("Starting new DB");
             database = new Database();
             return false;
         } catch (IOException e) {

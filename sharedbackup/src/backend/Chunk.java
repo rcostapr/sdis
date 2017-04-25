@@ -83,6 +83,7 @@ public class Chunk implements Serializable{
 
 				int chunkSize = (int) Math.min(SavedFile.CHUNK_SIZE,
 						file.getFileSize() - offset);
+				
 
 				byte[] chunk = new byte[chunkSize];
 				FileInputStream in = null;
