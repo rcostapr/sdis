@@ -6,9 +6,6 @@ import utils.Packet;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class MCListener implements Runnable{
 
 
@@ -43,7 +40,7 @@ public class MCListener implements Runnable{
 
         try {
             //TODO: get a way to stop this
-            while (true){
+            while (ConfigManager.getConfigManager().isAppRunning()){
                 final Packet messagePacket = receiver.receiveMessage();
 
                 Message receivedMessage = new Message(messagePacket.getMessage());

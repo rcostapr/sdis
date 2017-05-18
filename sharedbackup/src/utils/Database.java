@@ -22,7 +22,8 @@ public class Database implements Serializable {
 
 
     private List<Chunk> savedChunks; // chunks from others
-    private Map<String, SavedFile> savedFiles; // files from me
+    private Map<String, SavedFile> savedFiles; // my saved files
+    private Map<String, Integer> mDeletedFiles; // my shared files
 
 
     //private Map<String, Integer> mDeletedFiles;
@@ -32,8 +33,7 @@ public class Database implements Serializable {
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
-
-        //mDeletedFiles = new HashMap<String, Integer>();
+        mDeletedFiles = new HashMap<String, Integer>();
     }
 
     public List<Chunk> getSavedChunks() {
@@ -275,4 +275,5 @@ for (SavedFile file:savedFiles.values()){
         File folder = new File(deleteChunk.getFileID());
         folder.delete();
     }
+	
 }
