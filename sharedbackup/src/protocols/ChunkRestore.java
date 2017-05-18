@@ -18,8 +18,8 @@ public class ChunkRestore {
 	public static final String GET_COMMAND = "GETCHUNK";
 	public static final String CHUNK_COMMAND = "CHUNK";
 	public static final String CHUNK_CONFIRMATION = "CHUNKCONFIRM";
-	public static final int ENHANCEMENT_SEND_PORT = 50555;
-	public static final int ENHANCEMENT_RESPONSE_PORT = 50556;
+	public static final int ENHANCEMENT_SEND_PORT = 50558;
+	public static final int ENHANCEMENT_RESPONSE_PORT = 50559;
 	private static final int REQUEST_TIME_INTERVAL = 500;
 
 	private final ArrayList<ChunkData> mRequestedChunks;

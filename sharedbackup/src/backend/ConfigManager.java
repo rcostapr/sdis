@@ -285,4 +285,10 @@ public class ConfigManager {
     public boolean isAppRunning() {
         return isRunning;
     }
+
+	public void decDeletedFileReplication(String fileID) {
+		 database.decDeletedFileCount(fileID);
+	     database.saveDatabase();
+		
+	}
 }

@@ -124,6 +124,13 @@ public class MCHandler implements Runnable {
 					ConfigManager.getConfigManager().deleteFile(fileID);
 				}
 				break;
+				
+			case "WASDELETED":
+				if (messageID != ConfigManager.getConfigManager().getMyID()) {
+					fileID = headerParts[3].trim();
+					ConfigManager.getConfigManager().decDeletedFileReplication(fileID);
+				}
+				break;
 			case "REMOVED":
 				if (messageID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();

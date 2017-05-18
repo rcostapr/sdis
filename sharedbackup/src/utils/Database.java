@@ -275,5 +275,19 @@ for (SavedFile file:savedFiles.values()){
         File folder = new File(deleteChunk.getFileID());
         folder.delete();
     }
+    
+    public synchronized void decDeletedFileCount(String fileId) {
+		Integer currReplication = mDeletedFiles.get(fileId);
+		if (currReplication != null) {
+			int newReplication = mDeletedFiles.get(fileId) - 1;
+			if (newReplication <= 0) {
+				mDeletedFiles.remove(fileId);
+			} else {
+				synchronized (mDeletedFiles) {
+					mDeletedFiles.put(fileId, newReplication);
+				}
+			}
+		}
+	}
 	
 }
