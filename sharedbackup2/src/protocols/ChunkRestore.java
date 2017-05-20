@@ -18,8 +18,8 @@ public class ChunkRestore {
 	public static final String GET_COMMAND = "GETCHUNK";
 	public static final String CHUNK_COMMAND = "CHUNK";
 	public static final String CHUNK_CONFIRMATION = "CHUNKCONFIRM";
-	public static final int ENHANCEMENT_SEND_PORT = 50555;
-	public static final int ENHANCEMENT_RESPONSE_PORT = 50556;
+	public static final int ENHANCEMENT_SEND_PORT = 50558;
+	public static final int ENHANCEMENT_RESPONSE_PORT = 50559;
 	private static final int REQUEST_TIME_INTERVAL = 500;
 
 	private final ArrayList<ChunkData> mRequestedChunks;
@@ -118,5 +118,44 @@ public class ChunkRestore {
 
 	public synchronized void addRequestedChunk(ChunkData chunk) {
 		mRequestedChunks.add(chunk);
+	}
+	
+	public void answerToChunkMessage(InetAddress addr, int port, Chunk chunk) {
+
+		String message = "";
+
+		message += CHUNK_CONFIRMATION + " " + chunk.getFileID() + " "
+				+ chunk.getChunkNo() + MulticastServer.CRLF
+				+ MulticastServer.CRLF;
+
+		DatagramSocket socket = null;
+
+		try {
+			socket = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+
+		DatagramPacket packet = null;
+		try {
+			packet = new DatagramPacket(
+					message.getBytes(MulticastServer.ASCII_CODE),
+					message.getBytes(MulticastServer.ASCII_CODE).length,
+					addr, port);
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+		
+		System.out.println("Sent message to IP: " + message);
+
+		try {
+			socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		socket.close();
+
+		System.out.println("Answered to CHUNK command to IP");
 	}
 }

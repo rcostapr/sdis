@@ -37,6 +37,7 @@ public class Launcher {
 
 		if (args.length != 6) {
 			System.out.println("usage: " + programName +" Protocol_Version Server_ID Server_AP MC_Address:MC_Port MDB_Address:MDB_Port MDR_Address:MDR_Port");
+			System.exit(1);
 
 		} else {
 			//TODO: validate inputs
@@ -82,7 +83,8 @@ public class Launcher {
 
 				Interface.getInstance().startUp();
 
-				//Interface.getInstance().backupFile("\\test.txt", 1);
+				//System.out.println("== Start Backup File ==");
+				//if(!Interface.getInstance().backupFile("./test.txt", 1))System.out.println("== validateFile NOT VALID FILE PATH ==");
 
 			}
 			while (true);

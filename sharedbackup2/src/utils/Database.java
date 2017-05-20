@@ -22,7 +22,8 @@ public class Database implements Serializable {
 
 
     private List<Chunk> savedChunks; // chunks from others
-    private Map<String, SavedFile> savedFiles; // files from me
+    private Map<String, SavedFile> savedFiles; // my saved files
+    private Map<String, Integer> mDeletedFiles; // my shared files
 
 
     //private Map<String, Integer> mDeletedFiles;
@@ -32,8 +33,7 @@ public class Database implements Serializable {
         folder = "";
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
-
-        //mDeletedFiles = new HashMap<String, Integer>();
+        mDeletedFiles = new HashMap<String, Integer>();
     }
 
     public List<Chunk> getSavedChunks() {
@@ -121,7 +121,16 @@ public class Database implements Serializable {
             ConfigManager.FileAlreadySaved {
         SavedFile file = new SavedFile(path, replication);
         if (savedFiles.containsKey(file.getFileId())) {
-            throw new ConfigManager.FileAlreadySaved();
+        	System.out.println("============================");
+        	System.out.println("=== File Exists: " + path);
+        	System.out.println("=== File Replication: " + replication);
+        	System.out.println("=== File Saved Replication: " + file.getWantedReplicationDegree());
+        	System.out.println("=== Delete File and Put New one");
+        
+        	//if file already saved and replication degree is diferent -> delete file and store a new one
+        	ConfigManager.getConfigManager().removeFile(new File(path).getAbsolutePath());
+        	//throw new ConfigManager.FileAlreadySaved();
+        	
         }
         savedFiles.put(file.getFileId(), file);
 
@@ -140,7 +149,15 @@ public class Database implements Serializable {
                 return file;
             }
         }
+        System.out.println("getFileByPath File Not Found: " + path);
+        printSavedFiles();
         return null;
+    }
+    
+    public void printSavedFiles(){
+    	for (SavedFile file : savedFiles.values()) {
+            System.out.println("FileId: " + file.getFileId() + " FilePath: " +file.getFilePath().toString());
+        }
     }
 
     public void print() {
@@ -258,4 +275,19 @@ for (SavedFile file:savedFiles.values()){
         File folder = new File(deleteChunk.getFileID());
         folder.delete();
     }
+    
+    public synchronized void decDeletedFileCount(String fileId) {
+		Integer currReplication = mDeletedFiles.get(fileId);
+		if (currReplication != null) {
+			int newReplication = mDeletedFiles.get(fileId) - 1;
+			if (newReplication <= 0) {
+				mDeletedFiles.remove(fileId);
+			} else {
+				synchronized (mDeletedFiles) {
+					mDeletedFiles.put(fileId, newReplication);
+				}
+			}
+		}
+	}
+	
 }
