@@ -39,7 +39,6 @@ public class MCListener implements Runnable{
         receiver.join();
 
         try {
-            //TODO: get a way to stop this
             while (ConfigManager.getConfigManager().isAppRunning()){
                 final Packet messagePacket = receiver.receiveMessage();
 

@@ -31,7 +31,6 @@ public class MDBListener implements Runnable{
 
 
         try {
-            //TODO: get a way to stop this
             while (ConfigManager.getConfigManager().isAppRunning()){
                 final Packet messagePacket = receiver.receiveMessage();
 

@@ -30,7 +30,6 @@ public class MCHandler implements Runnable {
 		String messageType = headerParts[0].trim();
 		int messageID = Integer.parseInt(headerParts[2].trim());
 
-		// TODO:TAKE ME OUT LATER, JUST FOR TESTING
 		System.out.println("MC Received Message: " + messageType + " from " + messageID);
 
 		final String fileID;

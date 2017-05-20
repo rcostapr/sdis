@@ -23,7 +23,6 @@ public class MDBHandler implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO: TAKE ME OUT LATER JUST FOR TEST
 
 		String[] header_parts = message.getHeader().split(" ");
 		String messageType = header_parts[0].trim();

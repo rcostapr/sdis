@@ -44,7 +44,6 @@ public class MDRListener implements Runnable {
 		ConfigManager.getConfigManager().getExecutorService().execute(new restoreListenerIPListener());
 
 		try {
-			// TODO: get a way to stop this
 			while (ConfigManager.getConfigManager().isAppRunning()) {
 				final Packet messagePacket = receiver.receiveMessage();
 

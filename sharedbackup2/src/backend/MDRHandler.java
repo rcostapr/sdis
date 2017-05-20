@@ -19,7 +19,7 @@ public class MDRHandler implements Runnable {
 
     @Override
     public void run() {
-        //TODO: TAKE ME OUT LATER JUST FOR TEST
+
         System.out.println("MDR received a message");
 
         String[] header_parts = message.getHeader().split(" ");
@@ -37,7 +37,6 @@ public class MDRHandler implements Runnable {
                         for (ChunkRecord record : MDRListener.getInstance().subscribedChunks
                                 ) {
                             if (record.fileId.equals(fileID) && record.chunkNo == chunkNR) {
-                                //record.setServed(true);
                                 ChunkData wantedChunk = new ChunkData(fileID, chunkNR, message.getBody());
                                 ChunkRestore.getInstance().addRequestedChunk(wantedChunk);
                                 MDRListener.getInstance().subscribedChunks.remove(record);

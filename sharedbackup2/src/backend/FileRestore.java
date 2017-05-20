@@ -7,9 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by Duarte on 27-Mar-17.
- */
 public class FileRestore {
 
     private static FileRestore fInstance = null;
