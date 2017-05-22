@@ -1,8 +1,7 @@
 package frontend;
 
 import backend.*;
-import protocols.ChunkRestore;
-import protocols.FileDelete;
+import protocols.MasterPeer;
 import protocols.SpaceReclaim;
 import utils.RMI_Interface;
 
@@ -30,6 +29,7 @@ public class Interface implements RMI_Interface {
 	public void startUp() {
 		startRMI(accessPoint);
 		ConfigManager.getConfigManager().startupListeners();
+		MasterPeer.getInstance().sendStartup();
 		ConfigManager.getConfigManager().saveDB();
 	}
 
@@ -45,7 +45,7 @@ public class Interface implements RMI_Interface {
 			}
 			reg.rebind(accessPoint, stub);
 		} catch (RemoteException e) {
-			System.out.println("RMI problem");
+			System.out.println("RMI Problem");
 			e.printStackTrace();
 		}
 	}

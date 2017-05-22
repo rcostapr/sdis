@@ -72,10 +72,10 @@ public class MasterPeer {
 
 		message += WAKEUP_CMD + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
 
-		InetAddress multCAddr = ConfigManager.getConfigManager().getMcAddr();
-		int multCPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
+		int mcPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(multCAddr, multCPort);
+		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
 
 		int counter = 0;
 
@@ -153,10 +153,10 @@ public class MasterPeer {
 			throw new Exception();
 		}
 
-		InetAddress multCtrlAddr = ConfigManager.getConfigManager().getMcAddr();
-		int multCtrlPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
+		int mcPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(multCtrlAddr, multCtrlPort);
+		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
 
 		String message = null;
 
@@ -230,10 +230,10 @@ public class MasterPeer {
 			sentUpTime = uptime;
 		}
 
-		InetAddress multCtrlAddr = ConfigManager.getConfigManager().getMcAddr();
-		int multCtrlPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
+		int mcPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(multCtrlAddr, multCtrlPort);
+		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
 
 		String message = null;
 

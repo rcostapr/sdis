@@ -8,12 +8,10 @@ import java.rmi.registry.Registry;
 
 public class Client {
 
-
-    //TODO: Validate inputs, launch protocols
     static RMI_Interface stub;
 
     public static void main(String[] args) {
-        //TODO: USAGE and args validation
+
         //Client Acess_Point Command operand1 operand2
         try {
             Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);

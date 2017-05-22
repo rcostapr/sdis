@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -18,8 +19,8 @@ public class SharedDatabase implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public static final String FILE = "shareddata.ser";
-    private ArrayList<User> users;
+	public static final String FILE = "sharedDB.ser";
+    private static ArrayList<User> users;
     private ArrayList<FileRecord> files;
     private Date date;
     private long lastModification;
@@ -78,7 +79,7 @@ public class SharedDatabase implements Serializable {
         }
     }
 
-    public User login(String userName, String password) {
+    public static User login(String userName, String password) {
         for (int i = 0; i < users.size(); i++) {
             User u = users.get(i);
             if (u.login(userName, password))
@@ -94,7 +95,20 @@ public class SharedDatabase implements Serializable {
     }
 
     private void createFolders(String path) {
-		// TODO Auto-generated method stub
+    	File theDir = new File(path);
+		if (!theDir.exists()) {
+			System.out.println("Creating directory: " + theDir.getName());
+			boolean result = false;
+			try {
+				theDir.mkdir();
+				result = true;
+			} catch (SecurityException se) {
+				se.printStackTrace();
+			}
+			if (result) {
+				System.out.println("DIR Created");
+			}
+		}
 		
 	}
 

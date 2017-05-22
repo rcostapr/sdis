@@ -45,6 +45,7 @@ public class ConfigManager {
 	private int mMCport = 0, mMDBport = 0, mMDRport = 0;
 	private boolean isRunning;
 	private long startTime;
+	private User user;
 
 	// static
 	private static ConfigManager iConfigManager = null;
@@ -387,4 +388,8 @@ public class ConfigManager {
 	public void setDatabaseLoaded(boolean databaseLoaded) {
 		this.databaseLoaded = databaseLoaded;
 	}
+	
+	public boolean login(String username, String password) {
+        return (user = SharedDatabase.login(username, password)) != null;
+    }
 }
