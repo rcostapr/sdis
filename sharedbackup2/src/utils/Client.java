@@ -1,15 +1,11 @@
 package utils;
 
-import com.sun.org.apache.regexp.internal.RE;
 import utils.RMI_Interface;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-/**
- * Created by Duarte on 25-Mar-17.
- */
 public class Client {
 
 

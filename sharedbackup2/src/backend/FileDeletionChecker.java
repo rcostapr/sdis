@@ -2,6 +2,8 @@ package backend;
 
 import java.util.ArrayList;
 
+import protocols.FileDelete;
+
 public class FileDeletionChecker implements Runnable {
 
 	private static final int ONE_MINUTE = 60000;
@@ -16,7 +18,7 @@ public class FileDeletionChecker implements Runnable {
 				ArrayList<String> deletedFiles = ConfigManager.getConfigManager().getDeletedFiles();
 
 				for (String fileId : deletedFiles) {
-					FileDeletion.getInstance().deleteFile(fileId);
+					FileDelete.getInstance().deleteFile(fileId);
 					Thread.sleep(HALF_SECOND);
 				}
 

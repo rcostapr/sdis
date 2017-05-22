@@ -53,8 +53,8 @@ public class SharedClock {
         public void run() {
             while (ConfigManager.getConfigManager().isAppRunning()) {
                 try {
-                    MasterServices masterRef = MasterPeer.getInstance().getMasterStub();
-                    if (masterRef == null) {
+                    MasterPeerServices masterPeer = MasterPeer.getInstance().getMasterStub();
+                    if (masterPeer == null) {
                         System.err.println("Error getting the master reference.");
                         try {
                             Thread.sleep(FIVE_MINS);
@@ -86,5 +86,10 @@ public class SharedClock {
     }
 
     public static class NotSyncedException extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
     }
 }

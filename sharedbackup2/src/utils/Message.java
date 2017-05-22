@@ -6,9 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.util.Arrays;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class Message {
 
 	private String header;

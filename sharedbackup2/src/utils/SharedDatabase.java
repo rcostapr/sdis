@@ -7,25 +7,28 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-
+import backend.User;
 import protocols.FileRecord;
+import protocols.MasterPeer;
+import protocols.SharedClock;
 
 public class SharedDatabase implements Serializable {
 
-    public static final String FILE = ".shareddata.ser";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final String FILE = "shareddata.ser";
     private ArrayList<User> users;
+    private ArrayList<FileRecord> files;
     private Date date;
     private long lastModification;
 
 
     public SharedDatabase() {
         date = new Date();
-        users = new ArrayList<>();
-        files = new HashMap<>();
-
-        files.put(new ArrayList<FileRecord>());
-
+        users = new ArrayList<User>();
+        files = new ArrayList<FileRecord>();
         // indicates default database
         lastModification = 0;
     }
@@ -90,81 +93,87 @@ public class SharedDatabase implements Serializable {
         System.out.println("Created namespace folders");
     }
 
-    public void merge(SharedDatabase masterPeerDB) {
+    private void createFolders(String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void merge(SharedDatabase masterPeerDB) {
         long masterTimestamp = masterPeerDB.getLastModification();
         ArrayList<User> masterPeerUsers = masterPeerDB.getUsers();
+        ArrayList<FileRecord> masterFiles = masterPeerDB.getFiles();
 
         if (lastModification == 0) {
             // this is the default database
             lastModification = masterTimestamp;
-            users = masterUsers;
+            users = masterPeerUsers;
             files = masterFiles;
             return;
         }
         
         // merge users
-        for (User masterU : masterUsers) {
+        for (User masterPeerUser : masterPeerUsers) {
             boolean found = false;
-            for (User mineU : users) {
-                if (masterU.equals(mineU)) {
+            for (User nUser : users) {
+                if (masterPeerUser.equals(nUser)) {
                     found = true;
-                    if (!masterU.getHashedPassword().equals(mineU.getHashedPassword())
+                    if (!masterPeerUser.getHashedPassword().equals(nUser.getHashedPassword())
                             && masterTimestamp > lastModification) {
-                        mineU.setHashedPassword(masterU.getHashedPassword());
-                        System.out.println("Modified password of " + masterU.getUserName());
+                    	nUser.setHashedPassword(masterPeerUser.getHashedPassword());
+                        System.out.println("Modified password of " + masterPeerUser.getUserName());
                     }
                     break;
                 }
             }
             if (!found) {
-                users.add(masterU);
-                System.out.println("Added user " + masterU.getUserName());
+                users.add(masterPeerUser);
+                System.out.println("Added user " + masterPeerUser.getUserName());
             }
         }
 
         // send new users to master
-        for (User mineU : users) {
+        for (User nUser : users) {
             boolean found = false;
-            for (User masterU : masterUsers) {
-                if (masterU.equals(mineU)) {
+            for (User masterPeerUser : masterPeerUsers) {
+                if (masterPeerUser.equals(nUser)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 try {
-                    MasterPeer.getInstance().getMasterStub().addUser(mineU.getUserName(), mineU.getHashedPassword(),
-                            mineU.getAccessLevel());
+                    MasterPeer.getInstance().getMasterStub().addUser(nUser.getUserName(), nUser.getHashedPassword());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("Sent info of user " + mineU.getUserName());
+                System.out.println("Sent info of user " + nUser.getUserName());
             }
         }
         saveDatabase();
     }
 
-    public boolean addFile(FileRecord record) {
+    private ArrayList<FileRecord> getFiles() {
+		return files;
+	}
 
-        ArrayList<FileRecord> list = files.get(record.getAccessLevel());
+	public boolean addFile(FileRecord record) {
 
-        for (FileRecord fr : list) {
+        for (FileRecord fr : files) {
             if (fr.getHash().equals(record.getHash())) {
                 return false;
             }
         }
         // file not found
-        list.add(record);
+        files.add(record);
         return true;
     }
 
     public void removeFile(FileRecord record) {
-        ArrayList<FileRecord> list = files.get(record.getAccessLevel());
-        for (FileRecord fr : list) {
+        for (FileRecord fr : files) {
             if (fr.getHash().equals(record.getHash())) {
-                list.remove(fr);
+            	files.remove(fr);
             }
         }
     }

@@ -83,8 +83,6 @@ public class MasterPeer {
 
 			try {
 				sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
-			} catch (MulticastServer.HasToJoinException e1) {
-				e1.printStackTrace();
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -135,11 +133,11 @@ public class MasterPeer {
 			// update database with master's one
 			SharedDatabase masterPeerDB = null;
 			try {
-				masterPeerDB = getMasterStub().getMasterDB();
+				masterPeerDB = getMasterStub().getMasterPeerDB();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			ConfigManager.getConfigManager().getSDatabase().merge(masterPeerDB);
+			ConfigManager.getConfigManager().getSharedDatabase().merge(masterPeerDB);
 		}
 
 		try {
@@ -204,7 +202,7 @@ public class MasterPeer {
 
 		if (imMaster) {
 			try {
-				reg.unbind(MasterServices.REG_ID);
+				reg.unbind(MasterPeerServices.REG_ID);
 				UnicastRemoteObject.unexportObject(reg, true);
 			} catch (RemoteException e) {
 				e.printStackTrace();
@@ -248,7 +246,7 @@ public class MasterPeer {
 			System.out.println("Sending CANDIDATE");
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
 			Thread.sleep(WAIT_TIME_BOUND - waitTime);
-		} catch (MulticastServer.HasToJoinException | UnsupportedEncodingException | InterruptedException e) {
+		} catch (UnsupportedEncodingException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -332,9 +330,9 @@ public class MasterPeer {
 		try {
 			System.setProperty("java.rmi.server.hostname", ConfigManager.getConfigManager().getInterfaceIP());
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
-			MasterServices stub = (MasterServices) UnicastRemoteObject.exportObject(obj, 0);
-			reg.rebind(MasterServices.REG_ID, stub);
-			System.out.println("Registering stub with id " + MasterServices.REG_ID);
+			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
+			reg.rebind(MasterPeerServices.REG_ID, stub);
+			System.out.println("Registering stub with id " + MasterPeerServices.REG_ID);
 
 			System.out.println("Master services ready");
 		} catch (RemoteException e) {
@@ -345,10 +343,10 @@ public class MasterPeer {
 		}
 	}
 
-	public MasterServices getMasterStub() throws Exception {
+	public MasterPeerServices getMasterStub() throws Exception {
 		try {
 			reg = LocateRegistry.getRegistry(masterIp, REGISTRY_PORT);
-			return (MasterServices) reg.lookup(MasterServices.REG_ID);
+			return (MasterPeerServices) reg.lookup(MasterPeerServices.REG_ID);
 		} catch (RemoteException e) {
 			if (ConfigManager.getConfigManager().isServer()) {
 				System.err.println("Server could not connect to Master. Exiting...");

@@ -1,21 +1,25 @@
 package utils;
 
 import backend.Chunk;
-import backend.ChunkData;
 import backend.ConfigManager;
 import backend.SavedFile;
 import protocols.FileDelete;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.*;
 
-/**
- * Created by Duarte on 24-Mar-17.
- */
 public class Database implements Serializable {
 
 
-    public static final String FILE = "metadata.ser";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final String FILE = "metadata.ser";
+    private String communicationInterface = null;
 
     private String folder;
     private long maxBackupSize; // Bytes
@@ -23,14 +27,14 @@ public class Database implements Serializable {
 
     private List<Chunk> savedChunks; // chunks from others
     private Map<String, SavedFile> savedFiles; // my saved files
-    private Map<String, Integer> mDeletedFiles; // my shared files
-
-
-    //private Map<String, Integer> mDeletedFiles;
-
+    private Map<String, Integer> mDeletedFiles; // Deleted files
+    
+    private boolean loaded;
+    
     public Database() {
+    	setLoaded(false);
         maxBackupSize = 40000 * 1000;// 40MB default space
-        folder = "";
+        setFolder("");
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
         mDeletedFiles = new HashMap<String, Integer>();
@@ -288,6 +292,43 @@ for (SavedFile file:savedFiles.values()){
 				}
 			}
 		}
+	}
+    
+    public InetAddress getInterface() throws SocketException {
+        return NetworkInterface.getByName(communicationInterface).getInetAddresses().nextElement();
+    }
+
+    public String getInterfaceName() {
+        return communicationInterface;
+    }
+
+    public void setInterface(String intrfc) {
+        communicationInterface = intrfc;
+    }
+
+	public String getFolder() {
+		return folder;
+	}
+
+	public void setFolder(String folder) {
+		this.folder = folder;
+	}
+
+	public boolean isLoaded() {
+		return loaded;
+	}
+
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
+	}
+
+	public ArrayList<String> getDeletedFiles() {
+		ArrayList<String> retFiles = new ArrayList<String>();
+
+		for (SavedFile file : savedFiles.values()) {
+			retFiles.add(file.getFilePath());
+		}
+		return retFiles;
 	}
 	
 }

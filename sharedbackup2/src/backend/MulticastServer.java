@@ -112,5 +112,14 @@ public class MulticastServer {
 
 		return new Packet(message,(packet.getAddress()).getHostAddress());
 	}
+	
+	public class HasToJoinException extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+	}
 
 }
