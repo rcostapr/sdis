@@ -7,9 +7,6 @@ import sun.rmi.runtime.Log;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 
-/**
- * Created by Duarte on 28-Mar-17.
- */
 public class FileDelete {
     private static FileDelete sInstance = null;
 

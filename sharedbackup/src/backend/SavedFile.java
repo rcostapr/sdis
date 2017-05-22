@@ -6,9 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-/**
- * Created by Duarte on 18-Mar-17.
- */
 public class SavedFile implements Serializable {
 
 	public static final long CHUNK_SIZE = 64000;
@@ -139,4 +136,5 @@ public class SavedFile implements Serializable {
 		}
 		chunk.incCurrentReplication();
 	}
+
 }

@@ -1,6 +1,7 @@
 package backend;
 
 import protocols.ChunkBackup;
+import protocols.FileDelete;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,11 @@ public class FileBackup {
 
 			final Chunk chunk = list.get(i);
 
-			 ChunkBackup.getInstance().putChunk(chunk);
+			if (!ChunkBackup.getInstance().putChunk(chunk)) {
+				FileDelete.getInstance().deleteFile(file.getFileId());
+				ConfigManager.getConfigManager().removeSavedFile(file.getFilePath());
+			}
+
 		}
 		return true;
 	}

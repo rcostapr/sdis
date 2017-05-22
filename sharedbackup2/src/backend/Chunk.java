@@ -2,9 +2,6 @@ package backend;
 
 import java.io.*;
 
-/**
- * Created by Duarte on 18-Mar-17.
- */
 public class Chunk implements Serializable{
 
 	public static int MAX_CHUNK_SIZE = 64000;
@@ -83,6 +80,7 @@ public class Chunk implements Serializable{
 
 				int chunkSize = (int) Math.min(SavedFile.CHUNK_SIZE,
 						file.getFileSize() - offset);
+				
 
 				byte[] chunk = new byte[chunkSize];
 				FileInputStream in = null;

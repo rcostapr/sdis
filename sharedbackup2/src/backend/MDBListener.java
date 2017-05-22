@@ -5,9 +5,6 @@ import utils.Packet;
 
 import java.net.InetAddress;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class MDBListener implements Runnable{
     private static MDBListener mdbListener = null;
 
@@ -34,8 +31,7 @@ public class MDBListener implements Runnable{
 
 
         try {
-            //TODO: get a way to stop this
-            while (true){
+            while (ConfigManager.getConfigManager().isAppRunning()){
                 final Packet messagePacket = receiver.receiveMessage();
 
                 Message receivedMessage = new Message(messagePacket.getMessage());

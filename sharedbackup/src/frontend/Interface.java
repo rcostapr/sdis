@@ -12,9 +12,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-/**
- * Created by Duarte on 16-Mar-17.
- */
 public class Interface implements RMI_Interface {
 
 	private static Interface instance = null;

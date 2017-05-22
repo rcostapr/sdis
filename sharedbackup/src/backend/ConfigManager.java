@@ -34,6 +34,7 @@ public class ConfigManager {
     private Random random;
     private InetAddress mcAddr = null, mdbAddr = null, mdrAddr = null;
     private int mMCport = 0, mMDBport = 0, mMDRport = 0;
+    private boolean isRunning;
 
     // static
     private static ConfigManager iConfigManager = null;
@@ -45,6 +46,7 @@ public class ConfigManager {
         mExecutorService = Executors.newFixedThreadPool(60);
         isDatabaseLoaded = loadDatabase();
         random = new Random();
+        isRunning = true;
 
     }
 
@@ -160,6 +162,7 @@ public class ConfigManager {
 
     public void terminate() {
         mExecutorService.shutdown();
+        isRunning = false;
     }
 
     public int getMyID() {
@@ -275,4 +278,17 @@ public class ConfigManager {
     public static class FileAlreadySaved extends Exception {
 
     }
+    public void removeSavedFile(String filePath) {
+    	database.removeSavedFile(filePath);
+    	database.saveDatabase();
+    }
+    public boolean isAppRunning() {
+        return isRunning;
+    }
+
+	public void decDeletedFileReplication(String fileID) {
+		 database.decDeletedFileCount(fileID);
+	     database.saveDatabase();
+		
+	}
 }

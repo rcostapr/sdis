@@ -1,8 +1,5 @@
 package backend;
 
-/**
- * Created by Duarte on 27-Mar-17.
- */
 public class ChunkData extends Chunk{
     private byte[] data;
 
