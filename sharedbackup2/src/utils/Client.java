@@ -116,11 +116,11 @@ public class Client {
 		for (String str : args)
 			System.out.print(" " + str);
 		System.out.println();
-		boolean test = true;
+		boolean test = false;
 
 		if (!test) {
 
-			String command = args[1];
+			String command = args[0];
 			System.out.println("args = " + args.length);
 			boolean response = false;
 			switch (command) {
@@ -133,9 +133,9 @@ public class Client {
 				}
 				break;
 			case "BACKUP":
-				if (args.length == 4) {
+				if (args.length == 3) {
 					try {
-						response = stub.backupFile(args[2], Integer.parseInt(args[3]));
+						response = stub.backupFile(args[1], Integer.parseInt(args[2]));
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
@@ -145,11 +145,11 @@ public class Client {
 				break;
 
 			case "RESTORE":
-				if (args.length == 3) {
+				if (args.length == 2) {
 
 					response = false;
 					try {
-						response = stub.restoreFile(args[2]);
+						response = stub.restoreFile(args[1]);
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
@@ -159,10 +159,10 @@ public class Client {
 				break;
 
 			case "DELETE":
-				if (args.length == 3) {
+				if (args.length == 2) {
 					response = false;
 					try {
-						response = stub.deleteFile(args[2]);
+						response = stub.deleteFile(args[1]);
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
@@ -172,7 +172,7 @@ public class Client {
 				break;
 
 			case "STATE":
-				if (args.length == 2) {
+				if (args.length == 1) {
 					try {
 						stub.state();
 					} catch (RemoteException e) {
@@ -183,9 +183,9 @@ public class Client {
 				break;
 			case "RECLAIM":
 
-				if (args.length == 3) {
+				if (args.length == 2) {
 					try {
-						response = stub.spaceReclaim(Integer.parseInt(args[2]));
+						response = stub.spaceReclaim(Integer.parseInt(args[1]));
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
