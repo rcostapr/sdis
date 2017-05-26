@@ -14,4 +14,9 @@ public interface RMI_Interface extends Remote{
     boolean state() throws RemoteException;
     boolean deleteFile(String filePath) throws RemoteException;
     boolean spaceReclaim(int newSpace) throws RemoteException;
+	boolean login(String user, String password) throws RemoteException;
+	boolean userExists(String user) throws RemoteException;
+	void registerUser(String user, String password) throws RemoteException;
+	void printUsers() throws RemoteException;
+	String getUserName() throws RemoteException;
 }

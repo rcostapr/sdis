@@ -7,11 +7,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.BindException;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,7 +44,8 @@ public class ConfigManager {
 	private String RMI_Object_Name = null;
 
 	private boolean databaseLoaded;
-	
+	private boolean sharedDatabaseLoaded;
+
 	private Database database = null;
 	private SharedDatabase sharedDatabase = null;
 	private Random random;
@@ -56,6 +64,7 @@ public class ConfigManager {
 		mdbListener = null;
 		mExecutorService = Executors.newFixedThreadPool(60);
 		setDatabaseLoaded(loadDatabase());
+		setSharedDatabaseLoaded(loadSharedDatabase());
 		random = new Random();
 		isRunning = true;
 
@@ -74,15 +83,23 @@ public class ConfigManager {
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 
 			try {
+
 				database = (Database) in.readObject();
+
 			} catch (ClassNotFoundException e) {
 
-				System.out.println("Starting new DB");
+				Path currentRelativePath = Paths.get(Database.FILE);
+				Files.delete(currentRelativePath);
+
+				System.out.println("++++ Saved DB Incompatible ++++");
+				System.out.println("++++ Starting new DB ++++");
 				in.close();
 				fileIn.close();
 				database = new Database();
-				return false;
+				database.setLoaded(true);
+				return true;
 			}
+			database.setLoaded(true);
 			System.out.println("== DB already exists ==");
 			System.out.println("===== Saved Files =====");
 			database.printSavedFiles();
@@ -92,13 +109,14 @@ public class ConfigManager {
 
 		} catch (FileNotFoundException e) {
 
-			System.out.println("Starting new DB");
+			System.out.println("== Starting new DB ==");
 			database = new Database();
-			return false;
+			database.setLoaded(true);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
 
 	public void setRMI_Object_Name(String nome) {
@@ -203,6 +221,7 @@ public class ConfigManager {
 	}
 
 	public void saveDB() {
+
 		database.saveDatabase();
 	}
 
@@ -357,20 +376,16 @@ public class ConfigManager {
 			if (!MasterPeer.getInstance().imMaster()) {
 				SharedClock.getInstance().startSync();
 			}
-			sharedDatabase.createNameSpace(getChunksDestination());
 		} else {
 			throw new ConfigurationsNotInitializedException();
 		}
-		sharedDatabase.saveDatabase();
-	}
-	
-	public long getUpTime() {
-        Date d = new Date();
-        return d.getTime() - startTime;
-    }
 
-	private String getChunksDestination() {
-		return database.getFolder();
+		database.saveDatabase();
+	}
+
+	public long getUpTime() {
+		Date d = new Date();
+		return d.getTime() - startTime;
 	}
 
 	public SharedDatabase getSharedDatabase() {
@@ -388,8 +403,148 @@ public class ConfigManager {
 	public void setDatabaseLoaded(boolean databaseLoaded) {
 		this.databaseLoaded = databaseLoaded;
 	}
-	
+
 	public boolean login(String username, String password) {
-        return (user = SharedDatabase.login(username, password)) != null;
-    }
+		User loggedUser = sharedDatabase.login(username, password);
+		if(loggedUser!=null){
+			user = loggedUser;
+			return true;
+		}
+		return false;
+				
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public User setUser(User user) {
+		this.user = user;
+		return user;
+	}
+	
+	public boolean userExists(String user){
+		if(sharedDatabase.userExists(user)){
+			return true;
+		}
+		return false;
+	}
+
+	public InetAddress getInterface() {
+		try {
+			return database.getInterface();
+		} catch (SocketException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public void setInterface() throws IOException {
+		NetworkInterface selectedInterface = null;
+		// iterate over the network interfaces known to java
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		OUTER: for (NetworkInterface interface_ : Collections.list(interfaces)) {
+			// we shouldn't care about loopback addresses
+			if (interface_.isLoopback())
+				continue;
+
+			// if you don't expect the interface to be up you can skip this
+			// though it would question the usability of the rest of the code
+			if (!interface_.isUp())
+				continue;
+
+			// iterate over the addresses associated with the interface
+			Enumeration<InetAddress> addresses = interface_.getInetAddresses();
+			for (InetAddress address : Collections.list(addresses)) {
+				// look only for ipv4 addresses
+				if (address instanceof Inet6Address)
+					continue;
+
+				// use a timeout big enough for your needs
+				if (!address.isReachable(3000))
+					continue;
+
+				// we close the socket immediately after use
+				try (SocketChannel socket = SocketChannel.open()) {
+					// again, use a big enough timeout
+					socket.socket().setSoTimeout(3000);
+
+					// bind the socket to your local interface
+					socket.bind(new InetSocketAddress(address, 8080));
+
+					// try to connect to *somewhere*
+					try {
+						socket.connect(new InetSocketAddress("google.com", 80));
+
+					} catch (BindException be) {
+						// be.printStackTrace();
+					}
+
+				} catch (IOException ex) {
+					ex.printStackTrace();
+					continue;
+				}
+				selectedInterface = interface_;
+				System.out.format("network interface: %s, ia: %s\n", interface_, address);
+
+				// stops at the first *working* solution
+				break OUTER;
+			}
+		}
+		database.setInterface(selectedInterface.getDisplayName());
+	}
+
+	private boolean loadSharedDatabase() {
+		try {
+			FileInputStream fileIn = new FileInputStream(SharedDatabase.FILE);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+
+			try {
+				sharedDatabase = (SharedDatabase) in.readObject();
+			} catch (ClassNotFoundException e) {
+
+				System.out.println("Error while reading from saved shared database. Starting New shared database.");
+
+				sharedDatabase = new SharedDatabase();
+			}
+
+			System.out.println("Loaded shared database");
+
+			in.close();
+			fileIn.close();
+			return true;
+
+		} catch (FileNotFoundException e) {
+
+			System.out.println("New shared database");
+
+			sharedDatabase = new SharedDatabase();
+
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean isSharedDatabaseLoaded() {
+		return sharedDatabaseLoaded;
+	}
+
+	public void setSharedDatabaseLoaded(boolean sharedDatabaseLoaded) {
+		this.sharedDatabaseLoaded = sharedDatabaseLoaded;
+	}
+
+	public void registerUser(String user, String password) {
+		User newUser = new User(user,password);
+		sharedDatabase.addUser(newUser);		
+	}
+
+	public void printUsers() {
+		System.out.println("==================== USERS ==================" );
+		sharedDatabase.printUsers();
+		System.out.println("==================== USERS ==================" );
+		
+	}
+
 }

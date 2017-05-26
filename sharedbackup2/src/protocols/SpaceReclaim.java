@@ -26,7 +26,7 @@ public class SpaceReclaim {
 
 		String message = "";
 
-		message += "REMOVED" + " " + "1.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + chunk.getFileID()
+		message += "REMOVED" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + chunk.getFileID()
 				+ " " + chunk.getChunkNo() + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		InetAddress mcAddr = ConfigManager.getConfigManager().getMcAddr();

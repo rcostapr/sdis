@@ -30,7 +30,7 @@ public class ChunkBackup {
 
 		String header = "";
 
-		header += PUT_COMMAND + " " + "1.0"+" "+ ConfigManager.getConfigManager().getMyID()+" " + chunk.getFileID() + " " + chunk.getChunkNo() + " "
+		header += PUT_COMMAND + " " + "2.0"+" "+ ConfigManager.getConfigManager().getMyID()+" " + chunk.getFileID() + " " + chunk.getChunkNo() + " "
 				+ chunk.getWantedReplicationDegree()
 				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
@@ -103,7 +103,7 @@ public class ChunkBackup {
 
 		String message = null;
 
-		message = STORED_COMMAND + " " + "1.0" + " " + ConfigManager.getConfigManager().getMyID()+ " "+ chunk.getFileID() + " " + String.valueOf(chunk.getChunkNo())
+		message = STORED_COMMAND + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID()+ " "+ chunk.getFileID() + " " + String.valueOf(chunk.getChunkNo())
 				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {

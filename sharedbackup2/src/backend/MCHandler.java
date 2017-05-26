@@ -2,13 +2,15 @@ package backend;
 
 import protocols.ChunkBackup;
 import protocols.ChunkRestore;
+import protocols.FileRecord;
+import protocols.MasterPeer;
 import utils.Message;
 import utils.SplittedMessage;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.rmi.RemoteException;
 import java.util.Random;
 
 public class MCHandler implements Runnable {
@@ -35,7 +37,7 @@ public class MCHandler implements Runnable {
 		final String fileID;
 		final int chunkNR;
 
-		if (headerParts[1].trim().equals("1.0")) {
+		if (headerParts[1].trim().equals("2.0")) {
 			switch (messageType) {
 			case "STORED":
 
@@ -52,8 +54,7 @@ public class MCHandler implements Runnable {
 					synchronized (MCListener.getInstance().pendingChunks) {
 						for (Chunk chunk : MCListener.getInstance().pendingChunks) {
 							if (fileID.equals(chunk.getFileID()) && chunk.getChunkNo() == chunkNR) {
-								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from "
-										+ chunk.getCurrentReplicationDegree());
+								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from " + chunk.getCurrentReplicationDegree());
 								chunk.incCurrentReplication();
 								break;
 							}
@@ -123,7 +124,7 @@ public class MCHandler implements Runnable {
 					ConfigManager.getConfigManager().deleteFile(fileID);
 				}
 				break;
-				
+
 			case "WASDELETED":
 				if (messageID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
@@ -150,9 +151,95 @@ public class MCHandler implements Runnable {
 					}
 				}
 				break;
+			case "WAKED_UP":
+				if (ConfigManager.getConfigManager().isServer()) {
+					return;
+				}
+				if (MasterPeer.getInstance().imMaster()) {
+					try {
+						System.out.println("Sending IM_MASTER in response to WAKED_UP");
+						MasterPeer.getInstance().sendMasterCmd();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case "IM_MASTER":
+
+				String master = headerParts[3];
+
+				System.out.println("Received MASTER_CMD from " + master);
+
+				if (!MasterPeer.getInstance().checkIfMaster(master)) {
+
+					if (MasterPeer.getInstance().imMaster()) {
+						MasterPeer.getInstance().candidate();
+					} else {
+						try {
+							MasterPeer.setInitMaster(master);
+							ConfigManager.getConfigManager().getSharedDatabase().merge(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					System.out.println("Received valid IM_MASTER command");
+				}
+				break;
+			case "CANDIDATE":
+
+				if (ConfigManager.getConfigManager().isServer()) {
+					return;
+				}
+
+				long itsUptime = Long.parseLong(headerParts[1]);
+			
+				try {
+					MasterPeer.getInstance().updateMaster(IP, itsUptime);
+				} catch (Exception e) {
+					new Thread() {
+						@Override
+						public void run() {
+							MasterPeer.getInstance().candidate();
+						}
+					}.start();
+					try {
+						Thread.sleep(400);
+						MasterPeer.getInstance().updateMaster(IP, itsUptime);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+				break;
+			case "ADD_FILE":
+
+				fileID = headerParts[1].trim();
+				String filename = headerParts[2].trim();
+				String accessLevelStr = headerParts[3].trim();
+				int chunksCount = Integer.parseInt(headerParts[4].trim());
+				FileRecord newFile = new FileRecord(filename, fileID, chunksCount);
+
+				// add record to shared database, to keep them synced
+				ConfigManager.getConfigManager().getSharedDatabase().addFile(newFile);
+				break;
+			case "ADD_USER":
+
+				String username = headerParts[1].trim();
+				String hashedPassword = headerParts[2].trim();
+				accessLevelStr = headerParts[3].trim();
+				User newUser = new User(username, hashedPassword);
+				// update to proper password
+				newUser.setHashedPassword(hashedPassword);
+
+				// add record to shared database, to keep them synced
+				ConfigManager.getConfigManager().getSharedDatabase().addUser(newUser);
+				break;
+				
 			default:
 				// unknown
-				System.out.println("Can't handle " + messageType + "type");
+				System.out.println("Can't handle " + messageType + " type");
 				break;
 			}
 		} else

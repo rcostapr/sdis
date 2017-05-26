@@ -25,7 +25,7 @@ public class FileDelete {
     public boolean deleteFile(String fileID){
         String message = "";
 
-        message += "DELETE" +" "+"1.0"+ " "+ ConfigManager.getConfigManager().getMyID() +" " + fileID+ MulticastServer.CRLF
+        message += "DELETE" +" "+"2.0"+ " "+ ConfigManager.getConfigManager().getMyID() +" " + fileID+ MulticastServer.CRLF
                 + MulticastServer.CRLF;
 
         InetAddress mcAddr = ConfigManager.getConfigManager().getMcAddr();

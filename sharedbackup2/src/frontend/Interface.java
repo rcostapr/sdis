@@ -6,6 +6,7 @@ import protocols.SpaceReclaim;
 import utils.RMI_Interface;
 
 import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -26,11 +27,12 @@ public class Interface implements RMI_Interface {
 		return instance;
 	}
 
-	public void startUp() {
+	public void startUp() throws IOException {
 		startRMI(accessPoint);
 		ConfigManager.getConfigManager().startupListeners();
-		MasterPeer.getInstance().sendStartup();
+		ConfigManager.getConfigManager().setInterface();
 		ConfigManager.getConfigManager().saveDB();
+		MasterPeer.getInstance().sendStartup();
 	}
 
 	private void startRMI(String acessPoint) {
@@ -132,5 +134,32 @@ public class Interface implements RMI_Interface {
 			ConfigManager.getConfigManager().removeChunk(deletedChunk);
 		}
 		return true;
+	}
+
+	@Override
+	public boolean login(String user, String password) {
+		return ConfigManager.getConfigManager().login(user, password);
+	}
+
+	@Override
+	public boolean userExists(String user) {
+		return ConfigManager.getConfigManager().userExists(user);
+	}
+
+	@Override
+	public void registerUser(String user, String password) {
+		ConfigManager.getConfigManager().registerUser(user, password);
+	
+	}
+
+	@Override
+	public void printUsers() throws RemoteException {
+		ConfigManager.getConfigManager().printUsers();
+		
+	}
+
+	@Override
+	public String getUserName() throws RemoteException {
+		return ConfigManager.getConfigManager().getUser().getUserName();
 	}
 }

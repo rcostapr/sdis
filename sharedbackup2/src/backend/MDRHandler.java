@@ -25,7 +25,7 @@ public class MDRHandler implements Runnable {
         String[] header_parts = message.getHeader().split(" ");
         String messageType = header_parts[0].trim();
 
-        if (header_parts[1].trim().equals("1.0")) {
+        if (header_parts[1].trim().equals("2.0")) {
             switch (messageType) {
                 case "CHUNK":
                     int senderID = Integer.parseInt(header_parts[2].trim());

@@ -25,7 +25,7 @@ public class MasterPeer {
 	public static final String WAKEUP_CMD = "WAKED_UP";
 	public static final String MASTER_CMD = "IM_MASTER";
 	public static final String CANDIDATE_CMD = "CANDIDATE";
-	public static final int REGISTRY_PORT = 6548;
+	public static final int REGISTRY_PORT = 8010;
 	private static final int WAKE_UP_TIME_INTERVAL = 500;
 	private static final int MAX_RETRIES = 3;
 
@@ -70,7 +70,8 @@ public class MasterPeer {
 			e.printStackTrace();
 		}
 
-		message += WAKEUP_CMD + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
+		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
+		
 
 		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
 		int mcPort = ConfigManager.getConfigManager().getmMCport();
@@ -111,6 +112,7 @@ public class MasterPeer {
 
 			try {
 				masterIp = ConfigManager.getConfigManager().getInterfaceIP();
+				System.out.println(masterIp);
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
@@ -159,8 +161,8 @@ public class MasterPeer {
 		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
 
 		String message = null;
-
-		message = MASTER_CMD + " " + masterIp + MulticastServer.CRLF + MulticastServer.CRLF;
+//TODO
+		message = MASTER_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + masterIp + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
@@ -278,7 +280,7 @@ public class MasterPeer {
 	}
 
 	private class MasterCmdDiffuser implements Runnable {
-
+//TODO
 		@Override
 		public void run() {
 			while (masterUpdateFlag) {
@@ -328,6 +330,7 @@ public class MasterPeer {
 
 		MasterPeerActions obj = new MasterPeerActions();
 		try {
+			//TODO
 			System.setProperty("java.rmi.server.hostname", ConfigManager.getConfigManager().getInterfaceIP());
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);

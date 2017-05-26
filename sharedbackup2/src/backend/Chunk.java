@@ -4,6 +4,11 @@ import java.io.*;
 
 public class Chunk implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static int MAX_CHUNK_SIZE = 64000;
 
 	private SavedFile file;
@@ -117,7 +122,7 @@ public class Chunk implements Serializable{
 			try {
 				in = new FileInputStream(newchunkfile);
 				byte[] buffer = new byte[(int) newchunkfile.length()];
-				int i = in.read(buffer);
+				in.read(buffer);
 
 				in.close();
 				return buffer;

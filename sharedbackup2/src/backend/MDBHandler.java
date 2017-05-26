@@ -27,7 +27,7 @@ public class MDBHandler implements Runnable {
 		String[] header_parts = message.getHeader().split(" ");
 		String messageType = header_parts[0].trim();
 
-		if (header_parts[1].trim().equals("1.0")) {
+		if (header_parts[1].trim().equals("2.0")) {
 			System.out.println("MDB received a " + messageType);
 			switch (messageType) {
 			case "PUTCHUNK":

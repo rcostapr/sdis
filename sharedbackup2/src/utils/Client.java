@@ -11,12 +11,15 @@ public class Client {
 
 	static RMI_Interface stub;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws RemoteException {
 
 		String cmd = args[0];
 
 		switch (cmd) {
 		case "login":
+			if (args.length != 2) {
+				System.out.println("Wrong Parameters\nUsage: login <user>");
+			}
 			login(args);
 			break;
 		case "register":
@@ -30,35 +33,74 @@ public class Client {
 
 	}
 
-	public static void login(String[] args) {
-		// TODO
-		//Verificar se o user existe na base de dados
+	public static void login(String[] args) throws RemoteException {
+
+		// Client Acess_Point Command operand1 operand2
+		try {
+			Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
+			stub = (RMI_Interface) registry.lookup("RMI");
+		} catch (Exception e) {
+			System.out.print("== Server not Running ==");
+			System.exit(0);
+			// System.err.println("utils.Client exception: " + e.toString());
+			// e.printStackTrace();
+		}
 		
-		// TODO
-		//Se existe pedir password Caso contrario exibir mensagem de "User Not Found"
+		Scanner scanner = new Scanner(System.in);
 		
-		// TODO
-		//Se password é boa registar o utilizador e correr comandos caso contrário exibir Mensagem "Not a Valid Password"
-		runCMD();
+		System.out.println("Login User: " + args[1]);
+		String password = getPassword(scanner);
+
+		if (stub.login(args[1], password)) {
+			runCMD(scanner);
+		} else {
+			System.out.println("Wrong User or Password.");
+		}
+		
+		scanner.close();
 
 	}
 
-	public static void register(String[] args) {
-		
-		// TODO
-		// Fazer o registo do user
-		// pedir password
-		// confirmar password
-		// se as passwords coincidem fazer o registo do utilizador caso contrario exibir a mensagem "Passwords not Matching"
-		
-
+	private static String getPassword(Scanner scanner) {
+		// String password PasswordField.readPassword("Enter password: ");
+		System.out.print("Enter password:");
+		String password = scanner.nextLine();
+		return password;
 	}
 
-	public static void runCMD() {
+	public static void register(String[] args) throws RemoteException {
+
+		try {
+			Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
+			stub = (RMI_Interface) registry.lookup("RMI");
+		} catch (Exception e) {
+			System.out.print("== Server not Running ==");
+			System.exit(0);
+		}
+
+		stub.printUsers();
 
 		Scanner scanner = new Scanner(System.in);
+		
+		String password = getPassword(scanner);
+
+		if (stub.userExists((args[1]))) {
+			System.out.println("== User Already Exists ==");
+		} else {
+			stub.registerUser(args[1], password);
+		}
+
+		scanner.close();
+		System.exit(0);
+
+	}
+
+	public static void runCMD(Scanner scanner) throws RemoteException {
+
 		while (true) {
-			System.out.println("Insert CMD or \"quit\" to exit:");
+
+			clearConsole();
+			System.out.println("USER: \"" + stub.getUserName() + "\" insert CMD or \"quit\" to Exit:");
 			String cmd = scanner.nextLine();
 			if (cmd.equals("quit")) {
 				break;
@@ -67,7 +109,6 @@ public class Client {
 			sendCMD(args);
 		}
 		System.out.println("Exiting Shared Bakup ...");
-		scanner.close();
 	}
 
 	public static void sendCMD(String[] args) {
@@ -78,14 +119,6 @@ public class Client {
 		boolean test = true;
 
 		if (!test) {
-			// Client Acess_Point Command operand1 operand2
-			try {
-				Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
-				stub = (RMI_Interface) registry.lookup(args[0]);
-			} catch (Exception e) {
-				System.err.println("utils.Client exception: " + e.toString());
-				e.printStackTrace();
-			}
 
 			String command = args[1];
 			System.out.println("args = " + args.length);
@@ -163,6 +196,20 @@ public class Client {
 			default:
 				System.out.println("Command = " + command + " not recognized");
 			}
+		}
+	}
+
+	public final static void clearConsole() {
+		try {
+			final String os = System.getProperty("os.name");
+
+			if (os.contains("Windows")) {
+				Runtime.getRuntime().exec("cls");
+			} else {
+				Runtime.getRuntime().exec("clear");
+			}
+		} catch (final Exception e) {
+			// Handle any exceptions.
 		}
 	}
 }

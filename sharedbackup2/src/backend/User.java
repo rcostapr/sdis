@@ -6,7 +6,11 @@ import utils.Encode;
 
 public class User implements Serializable {
 
-    private String userName, password;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String userName, password;
 
     public User(String userName, String password) {
         this.userName = userName;

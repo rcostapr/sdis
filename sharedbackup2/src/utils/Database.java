@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Database implements Serializable {
@@ -34,7 +36,10 @@ public class Database implements Serializable {
     public Database() {
     	setLoaded(false);
         maxBackupSize = 40000 * 1000;// 40MB default space
-        setFolder("");
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+        setFolder(s);
+        //System.out.println("setFolder: " + s);
         savedFiles = new HashMap<String, SavedFile>();
         savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
         mDeletedFiles = new HashMap<String, Integer>();
