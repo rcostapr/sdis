@@ -6,6 +6,7 @@ import utils.SharedDatabase;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.net.BindException;
 import java.net.Inet4Address;
@@ -88,6 +89,17 @@ public class ConfigManager {
 
 			} catch (ClassNotFoundException e) {
 
+				Path currentRelativePath = Paths.get(Database.FILE);
+				Files.delete(currentRelativePath);
+
+				System.out.println("++++ Saved DB Incompatible ++++");
+				System.out.println("++++ Starting new DB ++++");
+				in.close();
+				fileIn.close();
+				database = new Database();
+				database.setLoaded(true);
+				return true;
+			} catch (InvalidClassException e){
 				Path currentRelativePath = Paths.get(Database.FILE);
 				Files.delete(currentRelativePath);
 

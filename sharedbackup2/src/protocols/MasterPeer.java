@@ -239,7 +239,7 @@ public class MasterPeer {
 
 		String message = null;
 
-		message = CANDIDATE_CMD + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
+		message = CANDIDATE_CMD + " " + "2.0" + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		Random r = new Random();
 		int waitTime = r.nextInt(MAX_WAIT_TIME);
