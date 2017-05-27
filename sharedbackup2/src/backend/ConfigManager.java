@@ -252,7 +252,20 @@ public class ConfigManager {
 
 	public void printState() {
 
-		database.print();
+		if(user.getUserName().equals("admin")){
+			database.print();
+			sharedDatabase.print();
+		} else {
+			sharedDatabase.print(user.getUserName());
+		}
+	}
+
+	public Database getDatabase() {
+		return database;
+	}
+
+	public void setDatabase(Database database) {
+		this.database = database;
 	}
 
 	public void deleteFile(String fileID) {

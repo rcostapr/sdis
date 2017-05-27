@@ -31,7 +31,7 @@ public class FileRestore {
             }
         }
         if (receivedChunks.size() == file.getChunkList().size()){
-            System.out.println("GOT ALL THE CHUNKS, REBUILDING");
+            System.out.println("GOT ALL THE CHUNKS REBUILDING");
             return rebuildFile(file,receivedChunks);
         }
         else return false;

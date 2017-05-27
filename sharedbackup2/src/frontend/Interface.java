@@ -7,6 +7,7 @@ import utils.RMI_Interface;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -102,8 +103,10 @@ public class Interface implements RMI_Interface {
 		this.accessPoint = accessPoint;
 	}
 
-	public boolean restoreFile(String filePath) {
-
+	public boolean restoreFile(String filename) {
+		
+		String filePath = new File(filename).getAbsolutePath();
+		
 		SavedFile fileToRestore = ConfigManager.getConfigManager().getFileByPath(filePath);
 		if (fileToRestore != null) {
 			return FileRestore.getInstance().restoreFile(fileToRestore);

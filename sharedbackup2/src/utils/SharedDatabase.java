@@ -8,6 +8,10 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import backend.Chunk;
+import backend.ConfigManager;
+import backend.SavedFile;
 import backend.User;
 import protocols.FileRecord;
 import protocols.MasterPeer;
@@ -79,11 +83,11 @@ public class SharedDatabase implements Serializable {
 	}
 
 	public User login(String userName, String password) {
-			for (int i = 0; i < users.size(); i++) {
-				User u = users.get(i);
-				if (u.login(userName, password))
-					return u;
-			}
+		for (int i = 0; i < users.size(); i++) {
+			User u = users.get(i);
+			if (u.login(userName, password))
+				return u;
+		}
 
 		return null;
 	}
@@ -203,6 +207,78 @@ public class SharedDatabase implements Serializable {
 		for (int i = 0; i < users.size(); i++) {
 			User u = users.get(i);
 			System.out.println(u.getUserName());
-		}		
+		}
 	}
+
+	public void printUserFiles() {
+		for (int i = 0; i < files.size(); i++) {
+			FileRecord fr = files.get(i);
+			System.out.println("Username: " + fr.getUsername() + " FileID: " + fr.getFileID());
+		}
+	}
+
+	public void print() {
+		System.out.println("=========  USERS  =============");
+		printUsers();
+		System.out.println("======= Files By User =========");
+		printUserFiles();
+		System.out.println("===============================");
+
+	}
+
+	public void print(String userName) {
+		System.out.println();
+		System.out.println("==============================================================");
+		System.out.println("Used Space: " + getUsedSpace(userName) / 1000 + " KB");
+		System.out.println("FILES FROM THIS PEER:");
+		for (SavedFile file : ConfigManager.getConfigManager().getDatabase().getSavedFiles().values()) {
+			if (isUserFile(file.getFileId())) {
+				System.out.println("----------------------------------------------------------");
+				System.out.println("file = " + file.getFilePath());
+				System.out.println("FileId = " + file.getFileId());
+				System.out.println("REP DEG = " + file.getWantedReplicationDegree());
+				System.out.println("..........................................................");
+				file.showFileChunks();
+				System.out.println("----------------------------------------------------------");
+				System.out.println();
+			}
+		}
+		System.out.println();
+		System.out.println("==============================================================");
+		System.out.println();
+		System.out.println("Chunks Stored on This Peer:");
+		System.out.println();
+		for (Chunk chunk : ConfigManager.getConfigManager().getDatabase().getSavedChunks()) {
+			if (isUserFile(chunk.getFileID())) {
+				System.out.println("chunk ID = " + chunk.getFileID());
+				System.out.println("Chunk NO = " + chunk.getChunkNo());
+				System.out.println("chunk size = " + chunk.getSize());
+				System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDegree());
+				System.out.println();
+			}
+		}
+		System.out.println("==============================================================");
+	}
+
+	private boolean isUserFile(String fileId) {
+		for (FileRecord record : files) {
+			if (record.getFileID().equals(fileId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private long getUsedSpace(String username) {
+		long usedSpace = 0;
+		for (FileRecord record : files) {
+			if (record.getUsername().equals(username))
+				for (Chunk chunk : ConfigManager.getConfigManager().getDatabase().getSavedChunks()) {
+					if (record.getFileID().equals(chunk.getFileID()))
+						usedSpace += chunk.getSize();
+				}
+		}
+		return usedSpace;
+	}
+
 }
