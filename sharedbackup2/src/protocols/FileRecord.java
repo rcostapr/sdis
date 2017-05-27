@@ -1,6 +1,12 @@
 package protocols;
 
-public class FileRecord {
+import java.io.Serializable;
+
+public class FileRecord  implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String fileID;
     private String username;
 
