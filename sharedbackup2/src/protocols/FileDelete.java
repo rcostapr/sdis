@@ -8,38 +8,36 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 
 public class FileDelete {
-    private static FileDelete sInstance = null;
+	private static FileDelete sInstance = null;
 
-    public static FileDelete getInstance() {
+	public static FileDelete getInstance() {
 
-        if (sInstance == null) {
-            sInstance = new FileDelete();
-        }
-        return sInstance;
-    }
+		if (sInstance == null) {
+			sInstance = new FileDelete();
+		}
+		return sInstance;
+	}
 
-    private FileDelete(){
+	private FileDelete() {
 
-    }
+	}
 
-    public boolean deleteFile(String fileID){
-        String message = "";
+	public boolean deleteFile(String fileID) {
+		String message = "";
 
-        message += "DELETE" +" "+"2.0"+ " "+ ConfigManager.getConfigManager().getMyID() +" " + fileID+ MulticastServer.CRLF
-                + MulticastServer.CRLF;
+		message += "DELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + fileID
+				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
-        InetAddress mcAddr = ConfigManager.getConfigManager().getMcAddr();
-        int mcPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress mcAddr = ConfigManager.getConfigManager().getMcAddr();
+		int mcPort = ConfigManager.getConfigManager().getmMCport();
 
-        MulticastServer sender = new MulticastServer(mcAddr,
-                mcPort);
+		MulticastServer sender = new MulticastServer(mcAddr, mcPort);
 
-        try {
-            sender.sendMessage(message
-                    .getBytes(MulticastServer.ASCII_CODE));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
+		try {
+			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
 }

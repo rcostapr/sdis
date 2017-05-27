@@ -20,12 +20,11 @@ public class FileDeletionChecker implements Runnable {
 				for (String fileID : deletedFiles) {
 					
 					//TODO
-					System.out.println("Deleted Files: " + fileID);
+					System.out.println("Checker Deleted Files: " + fileID);
 					FileDelete.getInstance().deleteFile(fileID);
 					Thread.sleep(HALF_SECOND);
 				}
 				Thread.sleep(ONE_MINUTE);
-				//System.out.println("FileDeletionChecker Thread.sleep(ONE_MINUTE)");
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();

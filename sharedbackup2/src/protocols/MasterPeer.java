@@ -221,8 +221,7 @@ public class MasterPeer {
 		imMaster = false;
 		masterIp = null;
 		masterUpTime = 0;
-		// I have thoroughly analysed my code and determined that the risks are
-		// acceptable
+		// I have thoroughly analysed my code and determined that the risks are acceptable
 		if (imMaster) {
 			masterUpdateFlag = false;
 		} else {
@@ -318,6 +317,7 @@ public class MasterPeer {
 
 				long now = new Date().getTime();
 				if ((now - lastMasterCmdTimestamp) > (MASTER_CMD_INTERVAL + TEN_SECONDS)) {
+					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (MASTER_CMD_INTERVAL + TEN_SECONDS));
 					candidate();
 				}
 			}
