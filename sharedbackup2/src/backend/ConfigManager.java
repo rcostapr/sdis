@@ -80,12 +80,12 @@ public class ConfigManager {
 
 	private boolean loadDatabase() {
 		try {
-			FileInputStream fileIn = new FileInputStream(Database.FILE);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
+			FileInputStream databaseFile = new FileInputStream(Database.FILE);
+			ObjectInputStream input = new ObjectInputStream(databaseFile);
 
 			try {
 
-				database = (Database) in.readObject();
+				database = (Database) input.readObject();
 
 			} catch (ClassNotFoundException e) {
 
@@ -94,19 +94,19 @@ public class ConfigManager {
 
 				System.out.println("++++ Saved DB Incompatible ++++");
 				System.out.println("++++ Starting new DB ++++");
-				in.close();
-				fileIn.close();
+				input.close();
+				databaseFile.close();
 				database = new Database();
 				database.setLoaded(true);
 				return true;
-			} catch (InvalidClassException e){
+			} catch (InvalidClassException e) {
 				Path currentRelativePath = Paths.get(Database.FILE);
 				Files.delete(currentRelativePath);
 
 				System.out.println("++++ Saved DB Incompatible ++++");
 				System.out.println("++++ Starting new DB ++++");
-				in.close();
-				fileIn.close();
+				input.close();
+				databaseFile.close();
 				database = new Database();
 				database.setLoaded(true);
 				return true;
@@ -116,8 +116,8 @@ public class ConfigManager {
 			System.out.println("===== Saved Files =====");
 			database.printSavedFiles();
 			System.out.println("=======================");
-			in.close();
-			fileIn.close();
+			input.close();
+			databaseFile.close();
 
 		} catch (FileNotFoundException e) {
 
@@ -417,13 +417,13 @@ public class ConfigManager {
 	}
 
 	public boolean login(String username, String password) {
-		User loggedUser = sharedDatabase.login(username, password);
-		if(loggedUser!=null){
+		User loggedUser = getSharedDatabase().login(username, password);
+		if (loggedUser != null) {
 			user = loggedUser;
 			return true;
 		}
 		return false;
-				
+
 	}
 
 	public User getUser() {
@@ -434,9 +434,9 @@ public class ConfigManager {
 		this.user = user;
 		return user;
 	}
-	
-	public boolean userExists(String user){
-		if(sharedDatabase.userExists(user)){
+
+	public boolean userExists(String user) {
+		if (sharedDatabase.userExists(user)) {
 			return true;
 		}
 		return false;
@@ -508,22 +508,27 @@ public class ConfigManager {
 
 	private boolean loadSharedDatabase() {
 		try {
-			FileInputStream fileIn = new FileInputStream(SharedDatabase.FILE);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
+			FileInputStream SDBfile = new FileInputStream(SharedDatabase.FILE);
+			ObjectInputStream input = new ObjectInputStream(SDBfile);
 
 			try {
-				sharedDatabase = (SharedDatabase) in.readObject();
-			} catch (ClassNotFoundException e) {
+
+				sharedDatabase = (SharedDatabase) input.readObject();
+				//sharedDatabase = new SharedDatabase();
+				System.out.println("Loaded shared database " + SharedDatabase.FILE);
+
+			} catch (Exception e) {
 
 				System.out.println("Error while reading from saved shared database. Starting New shared database.");
 
 				sharedDatabase = new SharedDatabase();
+				System.out.println("Class Error: New shared database created.");
 			}
 
-			System.out.println("Loaded shared database");
+			sharedDatabase.printUsers();
 
-			in.close();
-			fileIn.close();
+			input.close();
+			SDBfile.close();
 			return true;
 
 		} catch (FileNotFoundException e) {
@@ -548,15 +553,15 @@ public class ConfigManager {
 	}
 
 	public void registerUser(String user, String password) {
-		User newUser = new User(user,password);
-		sharedDatabase.addUser(newUser);		
+		User newUser = new User(user, password);
+		sharedDatabase.addUser(newUser);
 	}
 
 	public void printUsers() {
-		System.out.println("==================== USERS ==================" );
+		System.out.println("==================== USERS ==================");
 		sharedDatabase.printUsers();
-		System.out.println("==================== USERS ==================" );
-		
+		System.out.println("==================== USERS ==================");
+
 	}
 
 }

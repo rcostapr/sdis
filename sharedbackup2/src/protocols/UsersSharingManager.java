@@ -22,7 +22,6 @@ public class UsersSharingManager {
         return instance;
     }
 
-    // ADD_USER username hashedpassword accesslevel
     public boolean addUserToSharedDB(User user) {
 
         InetAddress multCtrlAddr = ConfigManager.getConfigManager().getMcAddr();
@@ -32,7 +31,7 @@ public class UsersSharingManager {
 
         String message;
 
-        message = ADD_USER_CMD + " " + user.getUserName() + " " + user.getHashedPassword() + " " + MulticastServer.CRLF + MulticastServer.CRLF;
+        message = ADD_USER_CMD + " " + user.getUserName() + " " + user.getPassword() + " " + MulticastServer.CRLF + MulticastServer.CRLF;
 
         try {
             sender.sendMessage(message

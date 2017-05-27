@@ -28,12 +28,29 @@ public class MasterPeerActions implements MasterPeerServices {
     }
 
     @Override
-    public void addUser(String username, String hashedPassword) throws RemoteException {
-        User user = new User(username, hashedPassword);
-        user.setHashedPassword(hashedPassword);
-        System.out.println("Received new username " + username + " info. Spreading the word...");
+    public void registerUser(String username, String password) throws RemoteException {
+        User user = new User(username, password);
+        System.out.println("Register new username " + username + " to DB.");
         ConfigManager.getConfigManager().getSharedDatabase().addUser(user);
         UsersSharingManager.getInstance().addUserToSharedDB(user);
     }
+
+	@Override
+	public boolean userExists(String user) {
+		if(ConfigManager.getConfigManager().getSharedDatabase().userExists(user)){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void addUser(String userName, String password) throws RemoteException {
+		 	User user = new User(userName, password);
+	        user.setHashedPassword(password);
+	        System.out.println("Add username " + userName + " to DB.");
+	        ConfigManager.getConfigManager().getSharedDatabase().addUser(user);
+	        UsersSharingManager.getInstance().addUserToSharedDB(user);
+		
+	}
 
 }

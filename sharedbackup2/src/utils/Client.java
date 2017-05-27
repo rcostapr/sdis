@@ -7,11 +7,15 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
+import protocols.MasterPeer;
+import protocols.MasterPeerServices;
+
 public class Client {
 
 	static RMI_Interface stub;
+	static MasterPeerServices masterstub;
 
-	public static void main(String[] args) throws RemoteException {
+	public static void main(String[] args) throws Exception {
 
 		String cmd = args[0];
 
@@ -35,19 +39,18 @@ public class Client {
 
 	public static void login(String[] args) throws RemoteException {
 
-		// Client Acess_Point Command operand1 operand2
 		try {
 			Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
 			stub = (RMI_Interface) registry.lookup("RMI");
 		} catch (Exception e) {
 			System.out.print("== Server not Running ==");
 			System.exit(0);
-			// System.err.println("utils.Client exception: " + e.toString());
-			// e.printStackTrace();
 		}
 		
+		stub.printUsers();
+
 		Scanner scanner = new Scanner(System.in);
-		
+
 		System.out.println("Login User: " + args[1]);
 		String password = getPassword(scanner);
 
@@ -56,8 +59,25 @@ public class Client {
 		} else {
 			System.out.println("Wrong User or Password.");
 		}
-		
+
 		scanner.close();
+
+	}
+
+	public static void register(String[] args) throws Exception {
+		
+		Scanner scanner = new Scanner(System.in);
+
+		String password = getPassword(scanner);
+
+		if (MasterPeer.getInstance().getMasterStub().userExists((args[1]))) {
+			System.out.println("== User Already Exists ==");
+		} else {
+			MasterPeer.getInstance().getMasterStub().registerUser(args[1], password);
+		}
+
+		scanner.close();
+		System.exit(0);
 
 	}
 
@@ -66,33 +86,6 @@ public class Client {
 		System.out.print("Enter password:");
 		String password = scanner.nextLine();
 		return password;
-	}
-
-	public static void register(String[] args) throws RemoteException {
-
-		try {
-			Registry registry = LocateRegistry.getRegistry(RMI_Interface.RMI_PORT);
-			stub = (RMI_Interface) registry.lookup("RMI");
-		} catch (Exception e) {
-			System.out.print("== Server not Running ==");
-			System.exit(0);
-		}
-
-		stub.printUsers();
-
-		Scanner scanner = new Scanner(System.in);
-		
-		String password = getPassword(scanner);
-
-		if (stub.userExists((args[1]))) {
-			System.out.println("== User Already Exists ==");
-		} else {
-			stub.registerUser(args[1], password);
-		}
-
-		scanner.close();
-		System.exit(0);
-
 	}
 
 	public static void runCMD(Scanner scanner) throws RemoteException {

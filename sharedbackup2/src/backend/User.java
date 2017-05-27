@@ -34,7 +34,7 @@ public class User implements Serializable {
                 .password);
     }
 
-    public String getHashedPassword() {
+    public String getPassword() {
         return password;
     }
 

@@ -20,7 +20,7 @@ public class SharedDatabase implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final String FILE = "sharedDB.ser";
-	private static ArrayList<User> users;
+	private ArrayList<User> users;
 	private ArrayList<FileRecord> files;
 	private Date date;
 	private long lastModification;
@@ -106,7 +106,7 @@ public class SharedDatabase implements Serializable {
 
 	}
 
-	public void merge(SharedDatabase masterPeerDB) {
+	public void join(SharedDatabase masterPeerDB) {
 		long masterTimestamp = masterPeerDB.getLastModification();
 		ArrayList<User> masterPeerUsers = masterPeerDB.getUsers();
 		ArrayList<FileRecord> masterFiles = masterPeerDB.getFiles();
@@ -125,8 +125,8 @@ public class SharedDatabase implements Serializable {
 			for (User nUser : users) {
 				if (masterPeerUser.equals(nUser)) {
 					found = true;
-					if (!masterPeerUser.getHashedPassword().equals(nUser.getHashedPassword()) && masterTimestamp > lastModification) {
-						nUser.setHashedPassword(masterPeerUser.getHashedPassword());
+					if (!masterPeerUser.getPassword().equals(nUser.getPassword()) && masterTimestamp > lastModification) {
+						nUser.setHashedPassword(masterPeerUser.getPassword());
 						System.out.println("Modified password of " + masterPeerUser.getUserName());
 					}
 					break;
@@ -149,7 +149,7 @@ public class SharedDatabase implements Serializable {
 			}
 			if (!found) {
 				try {
-					MasterPeer.getInstance().getMasterStub().addUser(nUser.getUserName(), nUser.getHashedPassword());
+					MasterPeer.getInstance().getMasterStub().addUser(nUser.getUserName(), nUser.getPassword());
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				} catch (Exception e) {

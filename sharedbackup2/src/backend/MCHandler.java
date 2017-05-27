@@ -177,7 +177,7 @@ public class MCHandler implements Runnable {
 					} else {
 						try {
 							MasterPeer.setInitMaster(master);
-							ConfigManager.getConfigManager().getSharedDatabase().merge(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
+							ConfigManager.getConfigManager().getSharedDatabase().join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						} catch (Exception e) {

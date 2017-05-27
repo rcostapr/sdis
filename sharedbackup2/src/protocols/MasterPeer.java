@@ -139,7 +139,7 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			ConfigManager.getConfigManager().getSharedDatabase().merge(masterPeerDB);
+			ConfigManager.getConfigManager().getSharedDatabase().join(masterPeerDB);
 		}
 
 		try {
