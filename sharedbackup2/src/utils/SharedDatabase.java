@@ -165,21 +165,21 @@ public class SharedDatabase implements Serializable {
 		return files;
 	}
 
-	public boolean addFile(FileRecord record) {
+	public boolean addFile(FileRecord newRecord) {
 
 		for (FileRecord fr : files) {
-			if (fr.getHash().equals(record.getHash())) {
+			if (fr.getFileID().equals(newRecord.getFileID())) {
 				return false;
 			}
 		}
 		// file not found
-		files.add(record);
+		files.add(newRecord);
 		return true;
 	}
 
-	public void removeFile(FileRecord record) {
+	public void removeFile(FileRecord deletedRecord) {
 		for (FileRecord fr : files) {
-			if (fr.getHash().equals(record.getHash())) {
+			if (fr.getFileID().equals(deletedRecord.getFileID())) {
 				files.remove(fr);
 			}
 		}

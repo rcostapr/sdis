@@ -30,9 +30,9 @@ public class MCHandler implements Runnable {
 		String[] headerParts = mMessage.getHeader().split(" ");
 
 		String messageType = headerParts[0].trim();
-		int messageID = Integer.parseInt(headerParts[2].trim());
+		int peerID = Integer.parseInt(headerParts[2].trim());
 
-		System.out.println("MC Received Message: " + messageType + " from " + messageID);
+		System.out.println("MC Received Message: " + messageType + " from " + peerID);
 
 		final String fileID;
 		final int chunkNR;
@@ -44,7 +44,7 @@ public class MCHandler implements Runnable {
 				fileID = headerParts[3].trim();
 				chunkNR = Integer.parseInt(headerParts[4].trim());
 				// if the file is mine, ++ repCount of the chunk
-				System.out.println("Received STORED from " + messageID + " for chunk " + chunkNR);
+				System.out.println("Received STORED from " + peerID + " for chunk " + chunkNR);
 
 				try {
 					System.out.println("try");
@@ -54,7 +54,8 @@ public class MCHandler implements Runnable {
 					synchronized (MCListener.getInstance().pendingChunks) {
 						for (Chunk chunk : MCListener.getInstance().pendingChunks) {
 							if (fileID.equals(chunk.getFileID()) && chunk.getChunkNo() == chunkNR) {
-								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from " + chunk.getCurrentReplicationDegree());
+								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from "
+										+ chunk.getCurrentReplicationDegree());
 								chunk.incCurrentReplication();
 								break;
 							}
@@ -69,7 +70,7 @@ public class MCHandler implements Runnable {
 
 				Chunk chunkToGet = ConfigManager.getConfigManager().getSavedChunk(fileID, chunkNR);
 
-				if (messageID != ConfigManager.getConfigManager().getMyID()) {
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					// if I don't store the chunk I don't care about the rest
 					if (chunkToGet != null) {
 						ChunkRecord record = new ChunkRecord(fileID, chunkNR);
@@ -119,20 +120,20 @@ public class MCHandler implements Runnable {
 				break;
 
 			case "DELETE":
-				if (messageID != ConfigManager.getConfigManager().getMyID()) {
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
 					ConfigManager.getConfigManager().deleteFile(fileID);
 				}
 				break;
 
 			case "WASDELETED":
-				if (messageID != ConfigManager.getConfigManager().getMyID()) {
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
 					ConfigManager.getConfigManager().decDeletedFileReplication(fileID);
 				}
 				break;
 			case "REMOVED":
-				if (messageID != ConfigManager.getConfigManager().getMyID()) {
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
 					chunkNR = Integer.parseInt(headerParts[4].trim());
 
@@ -152,32 +153,31 @@ public class MCHandler implements Runnable {
 				}
 				break;
 			case "WAKED_UP":
-				if (ConfigManager.getConfigManager().isServer()) {
-					return;
-				}
-				if (MasterPeer.getInstance().imMaster()) {
-					try {
-						System.out.println("Sending IM_MASTER in response to WAKED_UP");
-						MasterPeer.getInstance().sendMasterCmd();
-					} catch (Exception e) {
-						e.printStackTrace();
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
+					if (MasterPeer.getInstance().imMaster()) {
+						try {
+							System.out.println("Sending Peer:"+ConfigManager.getConfigManager().getMyID()+" i am MASTER ("+ConfigManager.getConfigManager().getInterfaceIP()+") in response to WAKED_UP");
+							MasterPeer.getInstance().sendMasterCmd();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				break;
-			case "IM_MASTER":
+			case "MASTER":
+				String masterIP = headerParts[3];
 
-				String master = headerParts[3];
+				System.out.println("Received MASTER CMD from " + masterIP);
 
-				System.out.println("Received MASTER_CMD from " + master);
-
-				if (!MasterPeer.getInstance().checkIfMaster(master)) {
+				if (!MasterPeer.getInstance().checkMasterPeer(masterIP)) {
 
 					if (MasterPeer.getInstance().imMaster()) {
 						MasterPeer.getInstance().candidate();
 					} else {
 						try {
-							MasterPeer.setInitMaster(master);
-							ConfigManager.getConfigManager().getSharedDatabase().join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
+							MasterPeer.setInitMaster(masterIP);
+							ConfigManager.getConfigManager().getSharedDatabase()
+									.join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						} catch (Exception e) {
@@ -185,59 +185,55 @@ public class MCHandler implements Runnable {
 						}
 					}
 				} else {
-					System.out.println("Received valid IM_MASTER command");
+					System.out.println("Received valid MASTER CMD from " + masterIP);
 				}
 				break;
 			case "CANDIDATE":
+				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 
-				if (ConfigManager.getConfigManager().isServer()) {
-					return;
-				}
+					long itsUptime = Long.parseLong(headerParts[3]);
 
-				long itsUptime = Long.parseLong(headerParts[2]);
-			
-				try {
-					MasterPeer.getInstance().updateMaster(IP, itsUptime);
-				} catch (Exception e) {
-					new Thread() {
-						@Override
-						public void run() {
-							MasterPeer.getInstance().candidate();
-						}
-					}.start();
 					try {
-						Thread.sleep(400);
 						MasterPeer.getInstance().updateMaster(IP, itsUptime);
-					} catch (Exception e1) {
-						e1.printStackTrace();
+					} catch (Exception e) {
+						new Thread() {
+							@Override
+							public void run() {
+								MasterPeer.getInstance().candidate();
+							}
+						}.start();
+						try {
+							Thread.sleep(400);
+							MasterPeer.getInstance().updateMaster(IP, itsUptime);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
 					}
 				}
 				break;
 			case "ADD_FILE":
 
-				fileID = headerParts[1].trim();
-				String filename = headerParts[2].trim();
-				int chunksCount = Integer.parseInt(headerParts[3].trim());
-				FileRecord newFile = new FileRecord(filename, fileID, chunksCount);
-
-				// add record to shared database, to keep them synced
+				fileID = headerParts[3].trim();
+				String username = headerParts[4].trim();
+				FileRecord newFile = new FileRecord(fileID, username);
+				// add record to shared database, to keep them sync
 				ConfigManager.getConfigManager().getSharedDatabase().addFile(newFile);
 				break;
 			case "ADD_USER":
 
-				String username = headerParts[1].trim();
+				String newUsername = headerParts[1].trim();
 				String password = headerParts[2].trim();
-				User newUser = new User(username, password);
+				User newUser = new User(newUsername, password);
 				// update to proper password
 				newUser.setHashedPassword(password);
 
-				// add record to shared database, to keep them synced
+				// add record to shared database, to keep them sync
 				ConfigManager.getConfigManager().getSharedDatabase().addUser(newUser);
 				break;
-				
+
 			default:
 				// unknown
-				System.out.println("Can't handle " + messageType + " type");
+				System.out.println("Do NOT KNOW" + messageType + " type.");
 				break;
 			}
 		} else

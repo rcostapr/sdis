@@ -235,6 +235,7 @@ public class ConfigManager {
 	public void saveDB() {
 
 		database.saveDatabase();
+		sharedDatabase.saveDatabase();
 	}
 
 	public SavedFile getNewSavedFile(String path, int replication) throws SavedFile.FileTooLargeException, FileAlreadySaved, SavedFile.FileDoesNotExistsException {
@@ -497,7 +498,7 @@ public class ConfigManager {
 					continue;
 				}
 				selectedInterface = interface_;
-				System.out.format("network interface: %s, ia: %s\n", interface_, address);
+				System.out.format("network interface: %sW IP: %s\n", interface_, address);
 
 				// stops at the first *working* solution
 				break OUTER;

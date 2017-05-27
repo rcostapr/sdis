@@ -23,7 +23,7 @@ public class MasterPeer {
 	private static MasterPeer instance = null;
 
 	public static final String WAKEUP_CMD = "WAKED_UP";
-	public static final String MASTER_CMD = "IM_MASTER";
+	public static final String MASTER_CMD = "MASTER";
 	public static final String CANDIDATE_CMD = "CANDIDATE";
 	public static final int REGISTRY_PORT = 8010;
 	private static final int WAKE_UP_TIME_INTERVAL = 500;
@@ -73,10 +73,10 @@ public class MasterPeer {
 		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
 		
 
-		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
-		int mcPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
+		int MCPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
+		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
 
 		int counter = 0;
 
@@ -112,14 +112,15 @@ public class MasterPeer {
 
 			try {
 				masterIp = ConfigManager.getConfigManager().getInterfaceIP();
-				System.out.println(masterIp);
+				System.out.println(masterIp + " " + "knowsMaster: " + knowsMaster + ". Try to Be Master.");
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
 			imMaster = true;
 			knowsMaster = true;
-
-			masterUpdate = new Thread(new MasterCmdDiffuser());
+			 
+			//TODO
+			masterUpdate = new Thread(new MasterCmdUpdate());
 			masterUpdateFlag = true;
 			masterUpdate.start();
 			try {
@@ -128,7 +129,8 @@ public class MasterPeer {
 				e.printStackTrace();
 			}
 		} else {
-			masterChecker = new Thread(new CheckMasterCmdExpiration());
+			ConfigManager.getConfigManager().setServer(false);
+			masterChecker = new Thread(new CheckMasterPeerExpiration());
 			masterCheckerFlag = true;
 			masterChecker.start();
 
@@ -155,10 +157,10 @@ public class MasterPeer {
 			throw new Exception();
 		}
 
-		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
-		int mcPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
+		int MCPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
+		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
 
 		String message = null;
 //TODO
@@ -189,7 +191,7 @@ public class MasterPeer {
 		masterIp = ip;
 	}
 
-	public boolean checkIfMaster(String ip) {
+	public boolean checkMasterPeer(String ip) {
 		lastMasterCmdTimestamp = new Date().getTime();
 		return ip.equals(masterIp);
 	}
@@ -200,7 +202,7 @@ public class MasterPeer {
 			return;
 		}
 
-		System.out.println("Initiating CANDIDATE protocol");
+		System.out.println("== Initiating CANDIDATE Protocol ==");
 
 		if (imMaster) {
 			try {
@@ -238,13 +240,13 @@ public class MasterPeer {
 
 		String message = null;
 
-		message = CANDIDATE_CMD + " " + "2.0" + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
+		message = CANDIDATE_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		Random r = new Random();
 		int waitTime = r.nextInt(MAX_WAIT_TIME);
 		try {
 			Thread.sleep(waitTime);
-			System.out.println("Sending CANDIDATE");
+			System.out.println("Sending New CANDIDATE CMD");
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
 			Thread.sleep(WAIT_TIME_BOUND - waitTime);
 		} catch (UnsupportedEncodingException | InterruptedException e) {
@@ -261,7 +263,7 @@ public class MasterPeer {
 			}
 			masterUpTime = uptime;
 
-			masterUpdate = new Thread(new MasterCmdDiffuser());
+			masterUpdate = new Thread(new MasterCmdUpdate());
 			masterUpdate.start();
 
 			try {
@@ -273,13 +275,13 @@ public class MasterPeer {
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
-			masterChecker = new Thread(new CheckMasterCmdExpiration());
+			masterChecker = new Thread(new CheckMasterPeerExpiration());
 			SharedClock.getInstance().startSync();
 			masterChecker.start();
 		}
 	}
 
-	private class MasterCmdDiffuser implements Runnable {
+	private class MasterCmdUpdate implements Runnable {
 //TODO
 		@Override
 		public void run() {
@@ -290,7 +292,7 @@ public class MasterPeer {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
-					System.out.println("Not master trying to send MASTER_CMD");
+					System.out.println("Not Master ERROR trying to Send MASTER_CMD");
 					System.exit(1);
 				}
 			}
@@ -304,7 +306,7 @@ public class MasterPeer {
 		return sentUpTime;
 	}
 
-	private class CheckMasterCmdExpiration implements Runnable {
+	private class CheckMasterPeerExpiration implements Runnable {
 
 		@Override
 		public void run() {
@@ -336,8 +338,9 @@ public class MasterPeer {
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
 			reg.rebind(MasterPeerServices.REG_ID, stub);
-			System.out.println("Registering stub with id " + MasterPeerServices.REG_ID);
+			System.out.println("Registering stub with Id " + MasterPeerServices.REG_ID);
 			System.out.println("Master services ready");
+			ConfigManager.getConfigManager().setServer(true);
 		} catch (RemoteException e) {
 			System.err.println("RMI registry not available. Exiting...");
 			System.exit(1);

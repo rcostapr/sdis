@@ -23,7 +23,7 @@ public class MasterPeerActions implements MasterPeerServices {
     public void addFile(FileRecord record) throws RemoteException {
         boolean isNew = ConfigManager.getConfigManager().getSharedDatabase().addFile(record);
         if (isNew) {
-            FilesSharingManager.getInstance().addFileToSharedDB(record);
+            FileRecordManager.getInstance().addFileToSharedDB(record);
         }
     }
 

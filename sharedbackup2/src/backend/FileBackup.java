@@ -2,6 +2,8 @@ package backend;
 
 import protocols.ChunkBackup;
 import protocols.FileDelete;
+import protocols.FileRecord;
+import protocols.MasterPeer;
 
 import java.util.ArrayList;
 
@@ -32,6 +34,17 @@ public class FileBackup {
 			}
 
 		}
+		
+		try {
+			FileRecord record = new FileRecord(file.getFileId(), ConfigManager.getConfigManager().getUser().getUserName());
+			MasterPeer.getInstance().getMasterStub().addFile(record);
+			
+		} catch (Exception e){
+			System.out.println("Fail to Sync New File -> " + file.getFilePath());
+			e.printStackTrace();
+		}
 		return true;
 	}
+	
+	
 }

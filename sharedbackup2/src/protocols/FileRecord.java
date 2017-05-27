@@ -1,25 +1,27 @@
 package protocols;
 
 public class FileRecord {
-	private String fileName;
-    private String hash;
-    private int chunksCount;
+	private String fileID;
+    private String username;
 
-    public FileRecord(String fileName, String hash, int chunksCount) {
-        this.fileName = fileName;
-        this.hash = hash;
-        this.chunksCount = chunksCount;
+    public FileRecord(String fileID, String user) {
+        this.setFileID(fileID);
+        this.setUsername(user);
     }
 
-    public String getFileName() {
-        return fileName;
-    }
+	public String getFileID() {
+		return fileID;
+	}
 
-    public String getHash() {
-        return hash;
-    }
+	public void setFileID(String fileID) {
+		this.fileID = fileID;
+	}
 
-    public int getChunksCount() {
-        return chunksCount;
-    }
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 }
