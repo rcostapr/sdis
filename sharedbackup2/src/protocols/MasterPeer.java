@@ -127,7 +127,6 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			ConfigManager.getConfigManager().setServer(true);
 		} else {
 			masterChecker = new Thread(new CheckMasterCmdExpiration());
 			masterCheckerFlag = true;
@@ -270,6 +269,7 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			ConfigManager.getConfigManager().setServer(true);
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
