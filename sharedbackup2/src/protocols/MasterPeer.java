@@ -127,6 +127,7 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			ConfigManager.getConfigManager().setServer(true);
 		} else {
 			masterChecker = new Thread(new CheckMasterCmdExpiration());
 			masterCheckerFlag = true;
@@ -336,7 +337,6 @@ public class MasterPeer {
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
 			reg.rebind(MasterPeerServices.REG_ID, stub);
 			System.out.println("Registering stub with id " + MasterPeerServices.REG_ID);
-
 			System.out.println("Master services ready");
 		} catch (RemoteException e) {
 			System.err.println("RMI registry not available. Exiting...");
