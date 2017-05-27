@@ -194,7 +194,7 @@ public class MCHandler implements Runnable {
 					return;
 				}
 
-				long itsUptime = Long.parseLong(headerParts[1]);
+				long itsUptime = Long.parseLong(headerParts[2]);
 			
 				try {
 					MasterPeer.getInstance().updateMaster(IP, itsUptime);
@@ -217,8 +217,7 @@ public class MCHandler implements Runnable {
 
 				fileID = headerParts[1].trim();
 				String filename = headerParts[2].trim();
-				String accessLevelStr = headerParts[3].trim();
-				int chunksCount = Integer.parseInt(headerParts[4].trim());
+				int chunksCount = Integer.parseInt(headerParts[3].trim());
 				FileRecord newFile = new FileRecord(filename, fileID, chunksCount);
 
 				// add record to shared database, to keep them synced
@@ -227,11 +226,10 @@ public class MCHandler implements Runnable {
 			case "ADD_USER":
 
 				String username = headerParts[1].trim();
-				String hashedPassword = headerParts[2].trim();
-				accessLevelStr = headerParts[3].trim();
-				User newUser = new User(username, hashedPassword);
+				String password = headerParts[2].trim();
+				User newUser = new User(username, password);
 				// update to proper password
-				newUser.setHashedPassword(hashedPassword);
+				newUser.setHashedPassword(password);
 
 				// add record to shared database, to keep them synced
 				ConfigManager.getConfigManager().getSharedDatabase().addUser(newUser);
