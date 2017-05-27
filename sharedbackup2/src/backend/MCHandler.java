@@ -221,8 +221,8 @@ public class MCHandler implements Runnable {
 				break;
 			case "ADD_USER":
 
-				String newUsername = headerParts[1].trim();
-				String password = headerParts[2].trim();
+				String newUsername = headerParts[3].trim();
+				String password = headerParts[4].trim();
 				User newUser = new User(newUsername, password);
 				// update to proper password
 				newUser.setHashedPassword(password);

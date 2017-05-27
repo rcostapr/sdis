@@ -31,7 +31,7 @@ public class UsersSharingManager {
 
         String message;
 
-        message = ADD_USER_CMD + " " + user.getUserName() + " " + user.getPassword() + " " + MulticastServer.CRLF + MulticastServer.CRLF;
+        message = ADD_USER_CMD + " " + "2.0"+ " " + ConfigManager.getConfigManager().getMyID() + " " + user.getUserName() + " " + user.getPassword() + " " + MulticastServer.CRLF + MulticastServer.CRLF;
 
         try {
             sender.sendMessage(message

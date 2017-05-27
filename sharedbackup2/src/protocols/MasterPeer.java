@@ -71,7 +71,6 @@ public class MasterPeer {
 		}
 
 		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
-		
 
 		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
 		int MCPort = ConfigManager.getConfigManager().getmMCport();
@@ -118,8 +117,8 @@ public class MasterPeer {
 			}
 			imMaster = true;
 			knowsMaster = true;
-			 
-			//TODO
+
+			// TODO
 			masterUpdate = new Thread(new MasterCmdUpdate());
 			masterUpdateFlag = true;
 			masterUpdate.start();
@@ -163,7 +162,7 @@ public class MasterPeer {
 		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
 
 		String message = null;
-//TODO
+		// TODO
 		message = MASTER_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + masterIp + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {
@@ -222,7 +221,8 @@ public class MasterPeer {
 		imMaster = false;
 		masterIp = null;
 		masterUpTime = 0;
-		// I have thoroughly analysed my code and determined that the risks are acceptable
+		// I have thoroughly analysed my code and determined that the risks are
+		// acceptable
 		if (imMaster) {
 			masterUpdateFlag = false;
 		} else {
@@ -282,7 +282,7 @@ public class MasterPeer {
 	}
 
 	private class MasterCmdUpdate implements Runnable {
-//TODO
+		// TODO
 		@Override
 		public void run() {
 			while (masterUpdateFlag) {
@@ -318,6 +318,7 @@ public class MasterPeer {
 				}
 
 				long now = new Date().getTime();
+				System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
 				if ((now - lastMasterCmdTimestamp) > (MASTER_CMD_INTERVAL + TEN_SECONDS)) {
 					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (MASTER_CMD_INTERVAL + TEN_SECONDS));
 					candidate();
@@ -333,7 +334,7 @@ public class MasterPeer {
 
 		MasterPeerActions obj = new MasterPeerActions();
 		try {
-			//TODO
+			// TODO
 			System.setProperty("java.rmi.server.hostname", ConfigManager.getConfigManager().getInterfaceIP());
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
