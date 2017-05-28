@@ -394,7 +394,7 @@ public class ConfigManager {
 		this.server = server;
 	}
 
-	public void enterMainStage() throws ConfigurationsNotInitializedException {
+	public void startClockSync() throws ConfigurationsNotInitializedException {
 		if (database.isLoaded()) {
 			mExecutorService.execute(new FileDeletionChecker());
 			Date d = new Date();

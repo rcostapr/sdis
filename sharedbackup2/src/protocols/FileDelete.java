@@ -22,16 +22,16 @@ public class FileDelete {
 
 	}
 
-	public boolean deleteFile(String fileID) {
+	public boolean deleteFile(String filePath) {
 		String message = "";
 
-		message += "DELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + fileID
+		message += "DELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + filePath
 				+ MulticastServer.CRLF + MulticastServer.CRLF;
 
-		InetAddress mcAddr = ConfigManager.getConfigManager().getMcAddr();
-		int mcPort = ConfigManager.getConfigManager().getmMCport();
+		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
+		int MCPort = ConfigManager.getConfigManager().getmMCport();
 
-		MulticastServer sender = new MulticastServer(mcAddr, mcPort);
+		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
 
 		try {
 			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));

@@ -144,7 +144,7 @@ public class MasterPeer {
 		}
 
 		try {
-			ConfigManager.getConfigManager().enterMainStage();
+			ConfigManager.getConfigManager().startClockSync();
 		} catch (ConfigManager.ConfigurationsNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(1);

@@ -296,8 +296,8 @@ public class Database implements Serializable {
 	public ArrayList<String> getDeletedFiles() {
 		ArrayList<String> retFiles = new ArrayList<String>();
 
-		for (SavedFile file : savedFiles.values()) {
-			retFiles.add(file.getFilePath());
+		for (String filePath : mDeletedFiles.keySet()) {
+			retFiles.add(filePath);
 		}
 		return retFiles;
 	}
