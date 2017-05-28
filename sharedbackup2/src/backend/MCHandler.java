@@ -156,8 +156,8 @@ public class MCHandler implements Runnable {
 				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					if (MasterPeer.getInstance().isMaster()) {
 						try {
-							System.out.println(
-									"Sending Peer:" + ConfigManager.getConfigManager().getMyID() + " I AM MASTER (" + ConfigManager.getConfigManager().getInterfaceIP() + ") in response to WAKED_UP From " + peerID);
+							System.out.println("Sending Peer:" + ConfigManager.getConfigManager().getMyID() + " I AM MASTER (" + ConfigManager.getConfigManager().getInterfaceIP()
+									+ ") in response to WAKED_UP From " + peerID);
 							MasterPeer.getInstance().sendMasterCmd();
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -170,15 +170,15 @@ public class MCHandler implements Runnable {
 				System.out.println("Received MASTER CMD from " + masterIP);
 
 				if (!MasterPeer.getInstance().checkMasterPeer(masterIP)) {
-					System.out.println(" Is not Master Peer sending MASTER CMD");
+					System.out.println(" This Master Peer is not the same that i have saved or Response to Wake UP Command. ");
 					if (MasterPeer.getInstance().isMaster()) {
-						System.out.println(" Peer sending Master CMD is not Master");
-								System.out.println(" Candidate to MasterPeer");
+						System.out.println(" Peer sending Master CMD is not Master.");
+						System.out.println(" Candidate to MasterPeer");
 						MasterPeer.getInstance().candidate();
 					} else {
 						try {
 							System.out.println(" Peer sending MASTER CMD is new MASTER PEER");
-									System.out.println(" Set knowsMaster and masterIp");
+							System.out.println(" Set knowsMaster and masterIp");
 							MasterPeer.setInitMaster(masterIP);
 							System.out.println(" Try to join Peer shared Database with new MasterPeer");
 							ConfigManager.getConfigManager().getSharedDatabase().join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
@@ -189,6 +189,7 @@ public class MCHandler implements Runnable {
 						}
 					}
 				} else {
+					// Already have this information. This command is not for me.
 					System.out.println("Received valid MASTER CMD from " + masterIP);
 				}
 				break;
@@ -198,7 +199,7 @@ public class MCHandler implements Runnable {
 					long itsUptime = Long.parseLong(headerParts[3]);
 
 					try {
-						MasterPeer.getInstance().updateMaster(IP, itsUptime);
+						MasterPeer.getInstance().updateMasterPeer(IP, itsUptime);
 					} catch (Exception e) {
 						new Thread() {
 							@Override
@@ -208,7 +209,7 @@ public class MCHandler implements Runnable {
 						}.start();
 						try {
 							Thread.sleep(400);
-							MasterPeer.getInstance().updateMaster(IP, itsUptime);
+							MasterPeer.getInstance().updateMasterPeer(IP, itsUptime);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}

@@ -35,14 +35,14 @@ public class MasterPeer {
 	private long masterUpTime = 0;
 
 	private long lastMasterCmdTimestamp;
-	private Thread masterUpdate = null;
-	private Thread masterChecker = null;
+	private Thread masterCmdUpdate = null;
+	private Thread masterPeerChecker = null;
 
 	private Long sentUpTime;
 	private boolean selectionRunning = false;
 
 	Registry reg;
-	private boolean masterCheckerFlag = false;
+	private boolean masterPeerCheckerFlag = false;
 	private boolean masterUpdateFlag = false;
 
 	private MasterPeer() {
@@ -67,7 +67,7 @@ public class MasterPeer {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-		
+
 		sendWakeUpCmd(ip);
 
 		if (!knowsMaster) {
@@ -86,21 +86,22 @@ public class MasterPeer {
 			imMaster = true;
 			knowsMaster = true;
 
-			masterUpdate = new Thread(new MasterCmdUpdate());
+			masterCmdUpdate = new Thread(new MasterCmdUpdate());
 			masterUpdateFlag = true;
-			masterUpdate.start();
+			masterCmdUpdate.start();
 			try {
 				masterPeerStartup();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
+			//TODO
 			ConfigManager.getConfigManager().setServer(false);
-			masterChecker = new Thread(new CheckMasterPeerExpiration());
-			masterCheckerFlag = true;
-			masterChecker.start();
+			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
+			masterPeerCheckerFlag = true;
+			masterPeerChecker.start();
 
-			// update database with master's one
+			// update database with the new MasterPeer
 			SharedDatabase masterPeerDB = null;
 			try {
 				masterPeerDB = getMasterStub().getMasterPeerDB();
@@ -119,9 +120,9 @@ public class MasterPeer {
 	}
 
 	private void sendWakeUpCmd(String ip) {
-		
+
 		String message = "";
-		
+
 		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
@@ -153,7 +154,7 @@ public class MasterPeer {
 			}
 
 		} while (counter < MAX_TRIES);
-		
+
 	}
 
 	public void sendMasterCmd() throws Exception {
@@ -179,8 +180,10 @@ public class MasterPeer {
 		}
 	}
 
-	public void updateMaster(String ip, long upTime) throws Exception {
+	public void updateMasterPeer(String ip, long upTime) throws Exception {
 		if (!selectionRunning) {
+			// If selection of the MasterPeer not running does not make any sense
+			// something wrong
 			throw new Exception();
 		}
 		if (upTime > masterUpTime) {
@@ -211,7 +214,7 @@ public class MasterPeer {
 		System.out.println("== Start CANDIDATE Protocol ==");
 
 		if (imMaster) {
-			System.out.println("imMaster try to unbind and remove remote obj");
+			System.out.println("Try to be Master. Try to unbind and remove remote obj");
 			try {
 				// Removes the binding for the specified name in this registry.
 				reg.unbind(MasterPeerServices.REG_ID);
@@ -232,19 +235,13 @@ public class MasterPeer {
 		imMaster = false;
 		masterIp = null;
 		masterUpTime = 0;
-		
-		// I have thoroughly analysed my code and determined that the risks are acceptable
-		if (imMaster) {
-			masterUpdateFlag = false;
-		} else {
-			masterCheckerFlag = false;
-		}
+		masterPeerCheckerFlag = false;
 
 		synchronized (sentUpTime) {
 			sentUpTime = uptime;
 		}
 
-		// Candidate Command
+		// Send Candidate Command
 		sendCandidateCmd();
 
 		if (!knowsMaster) {
@@ -257,8 +254,8 @@ public class MasterPeer {
 			}
 			masterUpTime = uptime;
 
-			masterUpdate = new Thread(new MasterCmdUpdate());
-			masterUpdate.start();
+			masterCmdUpdate = new Thread(new MasterCmdUpdate());
+			masterCmdUpdate.start();
 
 			try {
 				masterPeerStartup();
@@ -269,9 +266,10 @@ public class MasterPeer {
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
-			masterChecker = new Thread(new CheckMasterPeerExpiration());
+			ConfigManager.getConfigManager().setServer(false);
+			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
 			SharedClock.getInstance().startSync();
-			masterChecker.start();
+			masterPeerChecker.start();
 		}
 	}
 
@@ -304,7 +302,7 @@ public class MasterPeer {
 
 		@Override
 		public void run() {
-			while (masterCheckerFlag) {
+			while (masterPeerCheckerFlag) {
 				try {
 					Thread.sleep(TEN_SECONDS);
 				} catch (InterruptedException e) {
@@ -312,9 +310,10 @@ public class MasterPeer {
 				}
 
 				long now = new Date().getTime();
-				// System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
+				// System.out.println("CheckMasterPeerExpiration now:" + now + "
+				// lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
 				if ((now - lastMasterCmdTimestamp) > (ONE_MINUTE + TEN_SECONDS)) {
-					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (ONE_MINUTE + TEN_SECONDS));
+					System.out.println("candidate -> " + (now - lastMasterCmdTimestamp) + " > " + (ONE_MINUTE + TEN_SECONDS));
 					candidate();
 				}
 			}
@@ -323,15 +322,25 @@ public class MasterPeer {
 
 	private void masterPeerStartup() throws Exception {
 		if (!imMaster) {
+			// If not Master does not make any sense
+			// something wrong
 			throw new Exception();
 		}
 
 		MasterPeerActions obj = new MasterPeerActions();
 		try {
+			// The value of this property represents the host name string that should be associated with remote stubs 
+			// for locally created remote objects, in order to allow clients to invoke methods on the remote object. 
+			// The default value of this property is the IP address of the local host
 			System.setProperty("java.rmi.server.hostname", ConfigManager.getConfigManager().getInterfaceIP());
+			// LocateRegistry is used to obtain a reference to a bootstrap remote object registry
+			// on a particular host (including the local host), or to create a remote object registry that accepts calls on a specific port.
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
+			// Exports the remote object to make it available to receive incoming calls, using the particular supplied port.
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
+			// Replaces the binding for the specified name in this registry with the supplied remote reference.
 			reg.rebind(MasterPeerServices.REG_ID, stub);
+			
 			System.out.println("Registering stub with Id " + MasterPeerServices.REG_ID);
 			System.out.println("Master Services Ready");
 			ConfigManager.getConfigManager().setServer(true);
@@ -346,7 +355,9 @@ public class MasterPeer {
 
 	public MasterPeerServices getMasterStub() throws Exception {
 		try {
+			// Reference to the the remote object Registry for the masterIp host on the specified port.
 			reg = LocateRegistry.getRegistry(masterIp, REGISTRY_PORT);
+			// Available MasterPeerServices
 			return (MasterPeerServices) reg.lookup(MasterPeerServices.REG_ID);
 		} catch (RemoteException e) {
 			if (ConfigManager.getConfigManager().isServer()) {
