@@ -197,8 +197,8 @@ public class Database implements Serializable {
 			while (it.hasNext()) {
 				SavedFile file = it.next();
 				if (file.getFilePath().equals(f.getAbsolutePath())) {
-					//Check if all chunks was delete from peers backups
-					for(Chunk chunk : file.getChunkList()){
+					// Check if all chunks was delete from peers backups
+					for (Chunk chunk : file.getChunkList()) {
 						String fileChunkID = file.getFileId() + Long.toString(chunk.getChunkNo());
 						mDeletedFiles.put(fileChunkID, chunk);
 					}
@@ -262,15 +262,17 @@ public class Database implements Serializable {
 
 	public synchronized void decDeletedChunkFileCount(String fileId, long chunkNo) {
 		Chunk filechunk = mDeletedFiles.get(fileId);
-		Integer currReplication = filechunk.getCurrentReplicationDegree();
-		if (currReplication != null) {
-			int newReplication = filechunk.getCurrentReplicationDegree() - 1;
-			if (newReplication <= 0) {
-				mDeletedFiles.remove(fileId);
-			} else {
-				filechunk.setCurrentReplicationDegree(newReplication);
-				synchronized (mDeletedFiles) {
-					mDeletedFiles.put(fileId, filechunk);
+		if (filechunk != null) {
+			Integer currReplication = filechunk.getCurrentReplicationDegree();
+			if (currReplication != null) {
+				int newReplication = filechunk.getCurrentReplicationDegree() - 1;
+				if (newReplication <= 0) {
+					mDeletedFiles.remove(fileId);
+				} else {
+					filechunk.setCurrentReplicationDegree(newReplication);
+					synchronized (mDeletedFiles) {
+						mDeletedFiles.put(fileId, filechunk);
+					}
 				}
 			}
 		}
