@@ -126,7 +126,7 @@ public class MCHandler implements Runnable {
 				}
 				break;
 
-			case "WASDELETED":
+			case "WASDELETE":
 				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
 					String chunkNo = headerParts[4].trim();
@@ -234,7 +234,7 @@ public class MCHandler implements Runnable {
 
 			default:
 				// unknown
-				System.out.println("Do NOT KNOW" + messageType + " type.");
+				System.out.println("Do NOT KNOW " + messageType + " type.");
 				break;
 			}
 		} else
