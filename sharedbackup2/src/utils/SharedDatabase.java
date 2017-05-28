@@ -182,9 +182,11 @@ public class SharedDatabase implements Serializable {
 	}
 
 	public void removeFile(FileRecord deletedRecord) {
-		for (FileRecord fr : files) {
-			if (fr.getFileID().equals(deletedRecord.getFileID())) {
-				files.remove(fr);
+		synchronized (files) {
+			for (FileRecord fr : files) {
+				if (fr.getFileID().equals(deletedRecord.getFileID())) {
+					files.remove(fr);
+				}
 			}
 		}
 	}
