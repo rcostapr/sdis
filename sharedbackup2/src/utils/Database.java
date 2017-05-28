@@ -27,7 +27,7 @@ public class Database implements Serializable {
 
 	private List<Chunk> savedChunks; // chunks from others
 	private Map<String, SavedFile> savedFiles; // my saved files
-	private Map<String, Integer> mDeletedFiles; // Deleted files
+	private Map<String, Chunk> mDeletedFiles; // Deleted files
 
 	private boolean loaded;
 
@@ -40,7 +40,7 @@ public class Database implements Serializable {
 		// System.out.println("setFolder: " + s);
 		savedFiles = new HashMap<String, SavedFile>();
 		savedChunks = Collections.synchronizedList(new ArrayList<Chunk>());
-		mDeletedFiles = new HashMap<String, Integer>();
+		mDeletedFiles = new HashMap<String, Chunk>();
 	}
 
 	public List<Chunk> getSavedChunks() {
@@ -180,6 +180,7 @@ public class Database implements Serializable {
 				if (chunk.getFileID().equals(fileID)) {
 					chunk.removeData();
 					iterator.remove();
+					FileDelete.getInstance().wasDeleteChunkFile(chunk.getFileID(), Long.toString(chunk.getChunkNo()));
 				}
 			}
 		}
@@ -195,7 +196,11 @@ public class Database implements Serializable {
 			while (it.hasNext()) {
 				SavedFile file = it.next();
 				if (file.getFilePath().equals(f.getAbsolutePath())) {
-					mDeletedFiles.put(file.getFileId(), file.getWantedReplicationDegree());
+					//Check if all chunks was delete from peers backups
+					for(Chunk chunk : file.getChunkList()){
+						String fileChunkID = file.getFileId() + Long.toString(chunk.getChunkNo());
+						mDeletedFiles.put(fileChunkID, chunk);
+					}
 					FileDelete.getInstance().deleteFile(file.getFileId());
 					it.remove();
 				}
@@ -252,15 +257,17 @@ public class Database implements Serializable {
 		folder.delete();
 	}
 
-	public synchronized void decDeletedFileCount(String fileId) {
-		Integer currReplication = mDeletedFiles.get(fileId);
+	public synchronized void decDeletedChunkFileCount(String fileId, long chunkNo) {
+		Chunk filechunk = mDeletedFiles.get(fileId);
+		Integer currReplication = filechunk.getCurrentReplicationDegree();
 		if (currReplication != null) {
-			int newReplication = mDeletedFiles.get(fileId) - 1;
+			int newReplication = filechunk.getCurrentReplicationDegree() - 1;
 			if (newReplication <= 0) {
 				mDeletedFiles.remove(fileId);
 			} else {
+				filechunk.setCurrentReplicationDegree(newReplication);
 				synchronized (mDeletedFiles) {
-					mDeletedFiles.put(fileId, newReplication);
+					mDeletedFiles.put(fileId, filechunk);
 				}
 			}
 		}
@@ -294,13 +301,13 @@ public class Database implements Serializable {
 		this.loaded = loaded;
 	}
 
-	public ArrayList<String> getDeletedFiles() {
-		ArrayList<String> retFiles = new ArrayList<String>();
+	public ArrayList<Chunk> getDeletedChunkFiles() {
+		ArrayList<Chunk> retFileChunk = new ArrayList<Chunk>();
 
-		for (String filePath : mDeletedFiles.keySet()) {
-			retFiles.add(filePath);
+		for (Chunk chunk : mDeletedFiles.values()) {
+			retFileChunk.add(chunk);
 		}
-		return retFiles;
+		return retFileChunk;
 	}
 
 	public void print() {
@@ -324,6 +331,17 @@ public class Database implements Serializable {
 		System.out.println("Chunks Stored on This Peer:");
 		System.out.println();
 		for (Chunk chunk : savedChunks) {
+			System.out.println("chunk ID = " + chunk.getFileID());
+			System.out.println("Chunk NO = " + chunk.getChunkNo());
+			System.out.println("chunk size = " + chunk.getSize());
+			System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDegree());
+			System.out.println();
+		}
+		System.out.println("==============================================================");
+		System.out.println();
+		System.out.println("Missing Delete Chunks Of the Deleted Files in this Peer:");
+		System.out.println();
+		for (Chunk chunk : mDeletedFiles.values()) {
 			System.out.println("chunk ID = " + chunk.getFileID());
 			System.out.println("Chunk NO = " + chunk.getChunkNo());
 			System.out.println("chunk size = " + chunk.getSize());

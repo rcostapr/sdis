@@ -240,12 +240,10 @@ public class SharedDatabase implements Serializable {
 				System.out.println("..........................................................");
 				file.showFileChunks();
 				System.out.println("----------------------------------------------------------");
-				System.out.println();
 			}
 		}
 		System.out.println();
 		System.out.println("==============================================================");
-		System.out.println();
 		System.out.println("Chunks Stored on This Peer:");
 		System.out.println();
 		for (Chunk chunk : ConfigManager.getConfigManager().getDatabase().getSavedChunks()) {
@@ -254,7 +252,6 @@ public class SharedDatabase implements Serializable {
 				System.out.println("Chunk NO = " + chunk.getChunkNo());
 				System.out.println("chunk size = " + chunk.getSize());
 				System.out.println("CurrentReplicationDeg = " + chunk.getCurrentReplicationDegree());
-				System.out.println();
 			}
 		}
 		System.out.println("==============================================================");

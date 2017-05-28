@@ -364,8 +364,10 @@ public class ConfigManager {
 		return isRunning;
 	}
 
-	public void decDeletedFileReplication(String fileID) {
-		database.decDeletedFileCount(fileID);
+	public void decChunkDeletedFileReplication(String fileID, String chunkNo) {
+		String chunkFileId = fileID + chunkNo;
+		long chunkNof = Long.parseLong(chunkNo);
+		database.decDeletedChunkFileCount(chunkFileId, chunkNof);
 		database.saveDatabase();
 
 	}
@@ -419,8 +421,8 @@ public class ConfigManager {
 		return sharedDatabase;
 	}
 
-	public ArrayList<String> getDeletedFiles() {
-		return database.getDeletedFiles();
+	public ArrayList<Chunk> getDeletedChunkFiles() {
+		return database.getDeletedChunkFiles();
 	}
 
 	public boolean isDatabaseLoaded() {

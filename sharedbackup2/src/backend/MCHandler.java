@@ -129,7 +129,8 @@ public class MCHandler implements Runnable {
 			case "WASDELETED":
 				if (peerID != ConfigManager.getConfigManager().getMyID()) {
 					fileID = headerParts[3].trim();
-					ConfigManager.getConfigManager().decDeletedFileReplication(fileID);
+					String chunkNo = headerParts[4].trim();
+					ConfigManager.getConfigManager().decChunkDeletedFileReplication(fileID, chunkNo);
 				}
 				break;
 			case "REMOVED":

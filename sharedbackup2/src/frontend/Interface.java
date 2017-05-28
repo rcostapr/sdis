@@ -7,7 +7,6 @@ import utils.RMI_Interface;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -69,15 +68,9 @@ public class Interface implements RMI_Interface {
 				e.printStackTrace();
 			} catch (ConfigManager.FileAlreadySaved fileAlreadySaved) {
 				System.out.println("file Already Saved");
-				//fileAlreadySaved.printStackTrace();
 			} catch (SavedFile.FileDoesNotExistsException e) {
 				System.out.println("File Does Not Exists");
-				//e.printStackTrace();
 			}
-			// file.showFileChunks();
-
-			// TODO: if fileSize + database.availableSpace > Max space, cancel
-			// file.showFileChunks();
 
 			return FileBackup.getInstance().saveFile(file);
 

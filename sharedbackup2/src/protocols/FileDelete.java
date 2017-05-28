@@ -25,8 +25,25 @@ public class FileDelete {
 	public boolean deleteFile(String filePath) {
 		String message = "";
 
-		message += "DELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + filePath
-				+ MulticastServer.CRLF + MulticastServer.CRLF;
+		message += "DELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + filePath + MulticastServer.CRLF + MulticastServer.CRLF;
+
+		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
+		int MCPort = ConfigManager.getConfigManager().getmMCport();
+
+		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
+
+		try {
+			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public boolean wasDeleteChunkFile(String fileID, String chunkNo) {
+		String message = "";
+
+		message += "WASDELETE" + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + fileID + " " + chunkNo + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
 		int MCPort = ConfigManager.getConfigManager().getmMCport();

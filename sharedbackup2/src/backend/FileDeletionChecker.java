@@ -15,11 +15,11 @@ public class FileDeletionChecker implements Runnable {
 		try {
 			while (ConfigManager.getConfigManager().isAppRunning()) {
 				
-				ArrayList<String> deletedFiles = ConfigManager.getConfigManager().getDeletedFiles();
+				ArrayList<Chunk> deletedChunkFiles = ConfigManager.getConfigManager().getDeletedChunkFiles();
 
-				for (String filePath : deletedFiles) {
-					System.out.println("Checker Deleted Files: " + filePath);
-					FileDelete.getInstance().deleteFile(filePath);
+				for (Chunk chunk : deletedChunkFiles) {
+					System.out.println("Checker Deleted Files: " + chunk.getFileID());
+					FileDelete.getInstance().deleteFile(chunk.getFileID());
 					Thread.sleep(HALF_SECOND);
 				}
 				Thread.sleep(ONE_MINUTE);
