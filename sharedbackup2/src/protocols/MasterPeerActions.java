@@ -53,4 +53,9 @@ public class MasterPeerActions implements MasterPeerServices {
 		
 	}
 
+	@Override
+	public void deleteFile(FileRecord record) {
+		FileRecordManager.getInstance().deleteFileFromSharedDB(record);
+	}
+
 }

@@ -280,6 +280,12 @@ public class ConfigManager {
 			String fileId = file.getFileId();
 			if (sharedDatabase.isUserFile(fileId, user.getUserName())) {
 				System.out.println("Remove File - " + filePath);
+				FileRecord record = new FileRecord(fileId,user.getUserName());
+				try {
+					MasterPeer.getInstance().getMasterStub().deleteFile(record);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				database.removeSavedFile(filePath);
 				saveDB();
 			} else {
