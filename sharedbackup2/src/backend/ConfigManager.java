@@ -274,6 +274,7 @@ public class ConfigManager {
 	}
 
 	public void removeFile(String filePath) {
+		System.out.println("removeFile - " + filePath);
 		database.removeSavedFile(filePath);
 		saveDB();
 	}

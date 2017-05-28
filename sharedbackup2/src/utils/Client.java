@@ -70,13 +70,15 @@ public class Client {
 
 		String password = getPassword(scanner);
 
-		if (MasterPeer.getInstance().getMasterStub().userExists((args[1]))) {
+		if (MasterPeer.getInstance().getMasterStub().userExists(args[1])) {
 			System.out.println("== User Already Exists ==");
 		} else {
 			MasterPeer.getInstance().getMasterStub().registerUser(args[1], password);
 		}
 
 		scanner.close();
+		System.out.println("Type: \"login "+ args[1] + "\" to enter in Shared Backup ");
+		System.out.println("Exiting Shared Backup Register ...");
 		System.exit(0);
 
 	}
@@ -101,7 +103,7 @@ public class Client {
 			String[] args = cmd.split(" ");
 			sendCMD(args);
 		}
-		System.out.println("Exiting Shared Bakup ...");
+		System.out.println("Exiting Shared Backup ...");
 	}
 
 	public static void sendCMD(String[] args) {
