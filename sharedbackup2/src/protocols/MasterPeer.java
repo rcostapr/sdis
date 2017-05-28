@@ -262,6 +262,7 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			masterPeerCheckerFlag=false;
 			ConfigManager.getConfigManager().setServer(true);
 			System.out.println("I'm the new MASTER");
 		} else {
