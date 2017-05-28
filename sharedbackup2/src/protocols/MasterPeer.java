@@ -253,7 +253,7 @@ public class MasterPeer {
 				e.printStackTrace();
 			}
 			masterUpTime = uptime;
-
+			masterUpdateFlag = true;
 			masterCmdUpdate = new Thread(new MasterCmdUpdate());
 			masterCmdUpdate.start();
 
@@ -262,14 +262,13 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			masterUpdateFlag = true;
 			ConfigManager.getConfigManager().setServer(true);
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
-			masterPeerCheckerFlag = true;
 			ConfigManager.getConfigManager().setServer(false);
 			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
+			masterPeerCheckerFlag = true;
 			SharedClock.getInstance().startSync();
 			masterPeerChecker.start();
 		}
