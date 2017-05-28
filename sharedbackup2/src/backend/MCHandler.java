@@ -220,6 +220,14 @@ public class MCHandler implements Runnable {
 				// add record to shared database, to keep them sync
 				ConfigManager.getConfigManager().getSharedDatabase().addFile(newFile);
 				break;
+			case "DELETE_FILE":
+
+				fileID = headerParts[3].trim();
+				String uname = headerParts[4].trim();
+				FileRecord nFile = new FileRecord(fileID, uname);
+				// delete record from shared database, to keep them sync
+				ConfigManager.getConfigManager().getSharedDatabase().removeFile(nFile);
+				break;
 			case "ADD_USER":
 
 				String newUsername = headerParts[3].trim();

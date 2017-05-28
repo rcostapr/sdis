@@ -30,6 +30,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import protocols.FileRecord;
 import protocols.MasterPeer;
 import protocols.SharedClock;
 
@@ -274,7 +275,7 @@ public class ConfigManager {
 	}
 
 	public void removeFile(String filePath) {
-		System.out.println("removeFile - " + filePath);
+		System.out.println("Remove File - " + filePath);
 		database.removeSavedFile(filePath);
 		saveDB();
 	}
