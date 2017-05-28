@@ -417,7 +417,7 @@ public class ConfigManager {
 			mExecutorService.execute(new FileDeletionChecker());
 			Date d = new Date();
 			startTime = d.getTime();
-			if (!MasterPeer.getInstance().imMaster()) {
+			if (!MasterPeer.getInstance().isMaster()) {
 				SharedClock.getInstance().startSync();
 			}
 		} else {

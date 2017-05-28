@@ -54,8 +54,7 @@ public class MCHandler implements Runnable {
 					synchronized (MCListener.getInstance().pendingChunks) {
 						for (Chunk chunk : MCListener.getInstance().pendingChunks) {
 							if (fileID.equals(chunk.getFileID()) && chunk.getChunkNo() == chunkNR) {
-								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from "
-										+ chunk.getCurrentReplicationDegree());
+								System.out.println("Chunk " + chunk.getChunkNo() + " increasing from " + chunk.getCurrentReplicationDegree());
 								chunk.incCurrentReplication();
 								break;
 							}
@@ -155,9 +154,10 @@ public class MCHandler implements Runnable {
 				break;
 			case "WAKED_UP":
 				if (peerID != ConfigManager.getConfigManager().getMyID()) {
-					if (MasterPeer.getInstance().imMaster()) {
+					if (MasterPeer.getInstance().isMaster()) {
 						try {
-							System.out.println("Sending Peer:"+ConfigManager.getConfigManager().getMyID()+" i am MASTER ("+ConfigManager.getConfigManager().getInterfaceIP()+") in response to WAKED_UP");
+							System.out.println(
+									"Sending Peer:" + ConfigManager.getConfigManager().getMyID() + " I AM MASTER (" + ConfigManager.getConfigManager().getInterfaceIP() + ") in response to WAKED_UP From " + peerID);
 							MasterPeer.getInstance().sendMasterCmd();
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -167,18 +167,21 @@ public class MCHandler implements Runnable {
 				break;
 			case "MASTER":
 				String masterIP = headerParts[3];
-
 				System.out.println("Received MASTER CMD from " + masterIP);
 
 				if (!MasterPeer.getInstance().checkMasterPeer(masterIP)) {
-
-					if (MasterPeer.getInstance().imMaster()) {
+					System.out.println(" Is not Master Peer sending MASTER CMD");
+					if (MasterPeer.getInstance().isMaster()) {
+						System.out.println(" Peer sending Master CMD is not Master");
+								System.out.println(" Candidate to MasterPeer");
 						MasterPeer.getInstance().candidate();
 					} else {
 						try {
+							System.out.println(" Peer sending MASTER CMD is new MASTER PEER");
+									System.out.println(" Set knowsMaster and masterIp");
 							MasterPeer.setInitMaster(masterIP);
-							ConfigManager.getConfigManager().getSharedDatabase()
-									.join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
+							System.out.println(" Try to join Peer shared Database with new MasterPeer");
+							ConfigManager.getConfigManager().getSharedDatabase().join(MasterPeer.getInstance().getMasterStub().getMasterPeerDB());
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						} catch (Exception e) {

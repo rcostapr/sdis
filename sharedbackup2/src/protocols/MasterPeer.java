@@ -16,7 +16,7 @@ import backend.MulticastServer;
 import utils.SharedDatabase;
 
 public class MasterPeer {
-	public static final int MASTER_CMD_INTERVAL = 1000 * 60;
+	public static final int ONE_MINUTE = 1000 * 60;
 	public static final int TEN_SECONDS = 10000;
 	public static final int MAX_WAIT_TIME = 400;
 	public static final int WAIT_TIME_BOUND = 500;
@@ -27,7 +27,7 @@ public class MasterPeer {
 	public static final String CANDIDATE_CMD = "CANDIDATE";
 	public static final int REGISTRY_PORT = 8010;
 	private static final int WAKE_UP_TIME_INTERVAL = 500;
-	private static final int MAX_RETRIES = 3;
+	private static final int MAX_TRIES = 3;
 
 	private static boolean imMaster = false;
 	private static Boolean knowsMaster = false;
@@ -56,51 +56,19 @@ public class MasterPeer {
 		return instance;
 	}
 
-	public boolean imMaster() {
+	public boolean isMaster() {
 		return imMaster;
 	}
 
 	public void sendStartup() {
-		String message = "";
-
 		String ip = null;
 		try {
 			ip = ConfigManager.getConfigManager().getInterfaceIP();
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-
-		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
-
-		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
-		int MCPort = ConfigManager.getConfigManager().getmMCport();
-
-		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
-
-		int counter = 0;
-
-		do {
-
-			try {
-				sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			try {
-				System.out.println("WAITING : " + WAKE_UP_TIME_INTERVAL * (int) Math.pow(2, counter));
-				Thread.sleep(WAKE_UP_TIME_INTERVAL * (int) Math.pow(2, counter));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			counter++;
-
-			synchronized (knowsMaster) {
-				if (knowsMaster) {
-					break;
-				}
-			}
-
-		} while (counter < MAX_RETRIES);
+		
+		sendWakeUpCmd(ip);
 
 		if (!knowsMaster) {
 
@@ -150,8 +118,48 @@ public class MasterPeer {
 		}
 	}
 
+	private void sendWakeUpCmd(String ip) {
+		
+		String message = "";
+		
+		message += WAKEUP_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + ip + MulticastServer.CRLF + MulticastServer.CRLF;
+
+		InetAddress MCAddr = ConfigManager.getConfigManager().getMcAddr();
+		int MCPort = ConfigManager.getConfigManager().getmMCport();
+
+		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
+
+		int counter = 0;
+
+		do {
+
+			try {
+				sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			try {
+				System.out.println("WAITING : " + WAKE_UP_TIME_INTERVAL * (int) Math.pow(2, counter));
+				Thread.sleep(WAKE_UP_TIME_INTERVAL * (int) Math.pow(2, counter));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			counter++;
+
+			synchronized (knowsMaster) {
+				if (knowsMaster) {
+					break;
+				}
+			}
+
+		} while (counter < MAX_TRIES);
+		
+	}
+
 	public void sendMasterCmd() throws Exception {
 		if (!imMaster) {
+			// If not Master does not make any sense
+			// something wrong
 			throw new Exception();
 		}
 
@@ -203,8 +211,12 @@ public class MasterPeer {
 		System.out.println("== Start CANDIDATE Protocol ==");
 
 		if (imMaster) {
+			System.out.println("imMaster try to unbind and remove remote obj");
 			try {
+				// Removes the binding for the specified name in this registry.
 				reg.unbind(MasterPeerServices.REG_ID);
+				// Removes the remote object, obj, from the RMI runtime.
+				// If successful, the object can no longer accept incoming RMI calls.
 				UnicastRemoteObject.unexportObject(reg, true);
 			} catch (RemoteException e) {
 				e.printStackTrace();
@@ -270,7 +282,7 @@ public class MasterPeer {
 			while (masterUpdateFlag) {
 				try {
 					sendMasterCmd();
-					Thread.sleep(MASTER_CMD_INTERVAL);
+					Thread.sleep(ONE_MINUTE);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
@@ -300,10 +312,9 @@ public class MasterPeer {
 				}
 
 				long now = new Date().getTime();
-				// System.out.println("CheckMasterPeerExpiration now:" + now + "
-				// lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
-				if ((now - lastMasterCmdTimestamp) > (MASTER_CMD_INTERVAL + TEN_SECONDS)) {
-					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (MASTER_CMD_INTERVAL + TEN_SECONDS));
+				// System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
+				if ((now - lastMasterCmdTimestamp) > (ONE_MINUTE + TEN_SECONDS)) {
+					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (ONE_MINUTE + TEN_SECONDS));
 					candidate();
 				}
 			}

@@ -7,7 +7,7 @@ import utils.SharedDatabase;
 
 public interface MasterPeerServices extends Remote {
 
-    public static final String REG_ID = "2.0";
+    public static final String REG_ID = "RMI2.0";
 
     public long getMasterClock() throws RemoteException;
     public SharedDatabase getMasterPeerDB() throws RemoteException;
