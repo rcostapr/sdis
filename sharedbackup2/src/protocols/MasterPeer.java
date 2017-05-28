@@ -262,10 +262,12 @@ public class MasterPeer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			masterUpdateFlag = true;
 			ConfigManager.getConfigManager().setServer(true);
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
+			masterPeerCheckerFlag = true;
 			ConfigManager.getConfigManager().setServer(false);
 			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
 			SharedClock.getInstance().startSync();
@@ -289,13 +291,6 @@ public class MasterPeer {
 				}
 			}
 		}
-	}
-
-	public Long getSentUpTime() throws Exception {
-		if (!selectionRunning) {
-			throw new Exception();
-		}
-		return sentUpTime;
 	}
 
 	private class CheckMasterPeerExpiration implements Runnable {
