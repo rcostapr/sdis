@@ -15,5 +15,5 @@ public interface MasterPeerServices extends Remote {
 	public boolean userExists(String user) throws RemoteException;
 	public void registerUser(String string, String password) throws RemoteException;
 	public void addUser(String userName, String password) throws RemoteException;
-	public void deleteFile(FileRecord record);
+	public void deleteFile(FileRecord record) throws RemoteException;
 }

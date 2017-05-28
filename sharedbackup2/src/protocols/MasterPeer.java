@@ -39,7 +39,7 @@ public class MasterPeer {
 	private Thread masterChecker = null;
 
 	private Long sentUpTime;
-	private boolean MasterPeerRunning = false;
+	private boolean selectionRunning = false;
 
 	Registry reg;
 	private boolean masterCheckerFlag = false;
@@ -118,7 +118,6 @@ public class MasterPeer {
 			imMaster = true;
 			knowsMaster = true;
 
-			// TODO
 			masterUpdate = new Thread(new MasterCmdUpdate());
 			masterUpdateFlag = true;
 			masterUpdate.start();
@@ -162,7 +161,7 @@ public class MasterPeer {
 		MulticastServer sender = new MulticastServer(MCAddr, MCPort);
 
 		String message = null;
-		// TODO
+
 		message = MASTER_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + masterIp + MulticastServer.CRLF + MulticastServer.CRLF;
 
 		try {
@@ -173,7 +172,7 @@ public class MasterPeer {
 	}
 
 	public void updateMaster(String ip, long upTime) throws Exception {
-		if (!MasterPeerRunning) {
+		if (!selectionRunning) {
 			throw new Exception();
 		}
 		if (upTime > masterUpTime) {
@@ -201,7 +200,7 @@ public class MasterPeer {
 			return;
 		}
 
-		System.out.println("== Initiating CANDIDATE Protocol ==");
+		System.out.println("== Start CANDIDATE Protocol ==");
 
 		if (imMaster) {
 			try {
@@ -215,14 +214,14 @@ public class MasterPeer {
 		}
 
 		// initialize variables
-		MasterPeerRunning = true;
+		selectionRunning = true;
 		long uptime = ConfigManager.getConfigManager().getUpTime();
 		knowsMaster = false;
 		imMaster = false;
 		masterIp = null;
 		masterUpTime = 0;
-		// I have thoroughly analysed my code and determined that the risks are
-		// acceptable
+		
+		// I have thoroughly analysed my code and determined that the risks are acceptable
 		if (imMaster) {
 			masterUpdateFlag = false;
 		} else {
@@ -233,25 +232,8 @@ public class MasterPeer {
 			sentUpTime = uptime;
 		}
 
-		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
-		int mcPort = ConfigManager.getConfigManager().getmMCport();
-
-		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
-
-		String message = null;
-
-		message = CANDIDATE_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
-
-		Random r = new Random();
-		int waitTime = r.nextInt(MAX_WAIT_TIME);
-		try {
-			Thread.sleep(waitTime);
-			System.out.println("Sending New CANDIDATE CMD");
-			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
-			Thread.sleep(WAIT_TIME_BOUND - waitTime);
-		} catch (UnsupportedEncodingException | InterruptedException e) {
-			e.printStackTrace();
-		}
+		// Candidate Command
+		sendCandidateCmd();
 
 		if (!knowsMaster) {
 			imMaster = true;
@@ -282,7 +264,7 @@ public class MasterPeer {
 	}
 
 	private class MasterCmdUpdate implements Runnable {
-		// TODO
+
 		@Override
 		public void run() {
 			while (masterUpdateFlag) {
@@ -300,7 +282,7 @@ public class MasterPeer {
 	}
 
 	public Long getSentUpTime() throws Exception {
-		if (!MasterPeerRunning) {
+		if (!selectionRunning) {
 			throw new Exception();
 		}
 		return sentUpTime;
@@ -318,7 +300,8 @@ public class MasterPeer {
 				}
 
 				long now = new Date().getTime();
-				//System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
+				// System.out.println("CheckMasterPeerExpiration now:" + now + "
+				// lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
 				if ((now - lastMasterCmdTimestamp) > (MASTER_CMD_INTERVAL + TEN_SECONDS)) {
 					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (MASTER_CMD_INTERVAL + TEN_SECONDS));
 					candidate();
@@ -334,15 +317,15 @@ public class MasterPeer {
 
 		MasterPeerActions obj = new MasterPeerActions();
 		try {
-			// TODO
 			System.setProperty("java.rmi.server.hostname", ConfigManager.getConfigManager().getInterfaceIP());
 			reg = LocateRegistry.createRegistry(REGISTRY_PORT);
 			MasterPeerServices stub = (MasterPeerServices) UnicastRemoteObject.exportObject(obj, 0);
 			reg.rebind(MasterPeerServices.REG_ID, stub);
 			System.out.println("Registering stub with Id " + MasterPeerServices.REG_ID);
-			System.out.println("Master services ready");
+			System.out.println("Master Services Ready");
 			ConfigManager.getConfigManager().setServer(true);
 		} catch (RemoteException e) {
+			e.printStackTrace();
 			System.err.println("RMI registry not available. Exiting...");
 			System.exit(1);
 		} catch (SocketException e) {
@@ -366,6 +349,28 @@ public class MasterPeer {
 			System.exit(1);
 		}
 		return null;
+	}
+
+	public void sendCandidateCmd() {
+		InetAddress mcAddress = ConfigManager.getConfigManager().getMcAddr();
+		int mcPort = ConfigManager.getConfigManager().getmMCport();
+
+		MulticastServer sender = new MulticastServer(mcAddress, mcPort);
+
+		String message = null;
+
+		message = CANDIDATE_CMD + " " + "2.0" + " " + ConfigManager.getConfigManager().getMyID() + " " + sentUpTime + MulticastServer.CRLF + MulticastServer.CRLF;
+
+		Random r = new Random();
+		int waitTime = r.nextInt(MAX_WAIT_TIME);
+		try {
+			Thread.sleep(waitTime);
+			System.out.println("Sending New CANDIDATE CMD");
+			sender.sendMessage(message.getBytes(MulticastServer.ASCII_CODE));
+			Thread.sleep(WAIT_TIME_BOUND - waitTime);
+		} catch (UnsupportedEncodingException | InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

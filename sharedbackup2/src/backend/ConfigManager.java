@@ -529,7 +529,7 @@ public class ConfigManager {
 					continue;
 				}
 				selectedInterface = interface_;
-				System.out.format("network interface: %sW IP: %s\n", interface_, address);
+				System.out.format("Network Interface: %s IP: %s\n", interface_, address);
 
 				// stops at the first *working* solution
 				break OUTER;
