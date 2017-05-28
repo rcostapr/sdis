@@ -42,7 +42,7 @@ public class MasterPeer {
 	private boolean selectionRunning = false;
 
 	Registry reg;
-	private boolean masterPeerCheckerFlag = false;
+	private static boolean masterPeerCheckerFlag = false;
 	private boolean masterUpdateFlag = false;
 
 	private MasterPeer() {
@@ -95,7 +95,6 @@ public class MasterPeer {
 				e.printStackTrace();
 			}
 		} else {
-			//TODO
 			ConfigManager.getConfigManager().setServer(false);
 			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
 			masterPeerCheckerFlag = true;
@@ -198,6 +197,7 @@ public class MasterPeer {
 	public static void setInitMaster(String ip) {
 		knowsMaster = true;
 		masterIp = ip;
+		masterPeerCheckerFlag = true;
 	}
 
 	public boolean checkMasterPeer(String ip) {
@@ -263,15 +263,16 @@ public class MasterPeer {
 				e.printStackTrace();
 			}
 			masterPeerCheckerFlag=false;
+			selectionRunning = false;
 			ConfigManager.getConfigManager().setServer(true);
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
+			selectionRunning = false;
 			imMaster = false;
 			knowsMaster = true;
 			ConfigManager.getConfigManager().setServer(false);
 			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
-			masterPeerCheckerFlag = true;
 			SharedClock.getInstance().startSync();
 			masterPeerChecker.start();
 		}
@@ -310,7 +311,7 @@ public class MasterPeer {
 				// System.out.println("CheckMasterPeerExpiration now:" + now + "
 				// lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
 				if ((now - lastMasterCmdTimestamp) > (ONE_MINUTE + TEN_SECONDS)) {
-					System.out.println("candidate -> " + (now - lastMasterCmdTimestamp) + " > " + (ONE_MINUTE + TEN_SECONDS));
+					System.out.println("candidate :: " + (now - lastMasterCmdTimestamp) + " > " + (ONE_MINUTE + TEN_SECONDS));
 					candidate();
 				}
 			}
