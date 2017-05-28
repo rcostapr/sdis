@@ -195,6 +195,7 @@ public class Database implements Serializable {
 			while (it.hasNext()) {
 				SavedFile file = it.next();
 				if (file.getFilePath().equals(f.getAbsolutePath())) {
+					mDeletedFiles.put(file.getFileId(), file.getWantedReplicationDegree());
 					FileDelete.getInstance().deleteFile(file.getFileId());
 					it.remove();
 				}

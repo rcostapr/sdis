@@ -318,7 +318,7 @@ public class MasterPeer {
 				}
 
 				long now = new Date().getTime();
-				System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
+				//System.out.println("CheckMasterPeerExpiration now:" + now + " lastMasterCmdTimestamp:" + lastMasterCmdTimestamp);
 				if ((now - lastMasterCmdTimestamp) > (MASTER_CMD_INTERVAL + TEN_SECONDS)) {
 					System.out.println("candidate() " + (now - lastMasterCmdTimestamp) + " > " + (MASTER_CMD_INTERVAL + TEN_SECONDS));
 					candidate();

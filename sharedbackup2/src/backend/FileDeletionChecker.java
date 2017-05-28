@@ -18,8 +18,6 @@ public class FileDeletionChecker implements Runnable {
 				ArrayList<String> deletedFiles = ConfigManager.getConfigManager().getDeletedFiles();
 
 				for (String filePath : deletedFiles) {
-					
-					//TODO
 					System.out.println("Checker Deleted Files: " + filePath);
 					FileDelete.getInstance().deleteFile(filePath);
 					Thread.sleep(HALF_SECOND);
