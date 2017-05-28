@@ -253,7 +253,7 @@ public class ConfigManager {
 
 	public void printState() {
 
-		if(user.getUserName().equals("admin")){
+		if (user.getUserName().equals("admin")) {
 			database.print();
 			sharedDatabase.print();
 		} else {
@@ -275,9 +275,14 @@ public class ConfigManager {
 	}
 
 	public void removeFile(String filePath) {
-		System.out.println("Remove File - " + filePath);
-		database.removeSavedFile(filePath);
-		saveDB();
+		String fileId = database.getFileByPath(filePath).getFileId();
+		if (sharedDatabase.isUserFile(fileId, user.getUserName())) {
+			System.out.println("Remove File - " + filePath);
+			database.removeSavedFile(filePath);
+			saveDB();
+		} else {
+			System.out.println("->> You Can Only Delete your Own Files <<-");
+		}
 	}
 
 	public long getUsedSpace() {
@@ -532,7 +537,7 @@ public class ConfigManager {
 			try {
 
 				sharedDatabase = (SharedDatabase) input.readObject();
-				//sharedDatabase = new SharedDatabase();
+				// sharedDatabase = new SharedDatabase();
 				System.out.println("Loaded shared database " + SharedDatabase.FILE);
 
 			} catch (Exception e) {

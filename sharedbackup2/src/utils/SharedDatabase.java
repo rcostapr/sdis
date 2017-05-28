@@ -278,4 +278,13 @@ public class SharedDatabase implements Serializable {
 		return usedSpace;
 	}
 
+	public boolean isUserFile(String fileId, String userName) {
+		for (FileRecord record : files) {
+			if (record.getFileID().equals(fileId) && record.getUsername().equals(userName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

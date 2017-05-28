@@ -188,8 +188,9 @@ public class Database implements Serializable {
 		folder.delete();
 	}
 
-	public void removeSavedFile(String filePath) {
+	public String removeSavedFile(String filePath) {
 		File f = new File(filePath);
+		String fileId = null;
 		synchronized (savedFiles) {
 			Iterator<SavedFile> it = savedFiles.values().iterator();
 
@@ -201,11 +202,13 @@ public class Database implements Serializable {
 						String fileChunkID = file.getFileId() + Long.toString(chunk.getChunkNo());
 						mDeletedFiles.put(fileChunkID, chunk);
 					}
+					fileId = file.getFileId();
 					FileDelete.getInstance().deleteFile(file.getFileId());
 					it.remove();
 				}
 			}
 		}
+		return fileId;
 	}
 
 	public long getUsedSpace() {
