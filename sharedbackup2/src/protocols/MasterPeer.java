@@ -267,6 +267,8 @@ public class MasterPeer {
 			System.out.println("I'm the new MASTER");
 		} else {
 			System.out.println("New MASTER is " + masterIp);
+			imMaster = false;
+			knowsMaster = true;
 			ConfigManager.getConfigManager().setServer(false);
 			masterPeerChecker = new Thread(new CheckMasterPeerExpiration());
 			masterPeerCheckerFlag = true;
