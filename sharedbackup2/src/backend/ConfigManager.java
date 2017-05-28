@@ -275,13 +275,16 @@ public class ConfigManager {
 	}
 
 	public void removeFile(String filePath) {
-		String fileId = database.getFileByPath(filePath).getFileId();
-		if (sharedDatabase.isUserFile(fileId, user.getUserName())) {
-			System.out.println("Remove File - " + filePath);
-			database.removeSavedFile(filePath);
-			saveDB();
-		} else {
-			System.out.println("->> You Can Only Delete your Own Files <<-");
+		SavedFile file = database.getFileByPath(filePath);
+		if (file != null) {
+			String fileId = file.getFileId();
+			if (sharedDatabase.isUserFile(fileId, user.getUserName())) {
+				System.out.println("Remove File - " + filePath);
+				database.removeSavedFile(filePath);
+				saveDB();
+			} else {
+				System.out.println("->> You Can Only Delete your Own Files <<-");
+			}
 		}
 	}
 
